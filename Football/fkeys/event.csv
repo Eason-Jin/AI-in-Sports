@@ -1,7 +1,3 @@
-id,event,eventname
-0,,Duel
-1,,Free Kick
-2,,Others on the ball
-3,,Pass
-4,,Save attempt
-5,,Shot
+version https://git-lfs.github.com/spec/v1
+oid sha256:28b006feee4f5ad9132d1c8ee3671b8dcf1405bd745cfc1b258f7316c3afb94d
+size 101

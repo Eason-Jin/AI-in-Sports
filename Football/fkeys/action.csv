@@ -1,23 +1,3 @@
-id,action
-0,Acceleration
-1,Air duel
-2,Clearance
-3,Corner
-4,Cross
-5,Free Kick
-6,Free kick cross
-7,Free kick shot
-8,Ground attacking duel
-9,Ground defending duel
-10,Ground loose ball duel
-11,Hand pass
-12,Head pass
-13,High pass
-14,Launch
-15,Penalty
-16,Reflexes
-17,Save attempt
-18,Shot
-19,Simple pass
-20,Smart pass
-21,Throw in
+version https://git-lfs.github.com/spec/v1
+oid sha256:9bd59f0468a4824e20daf8343f97a5a7e86b7d2a8779a57040bb26d758fe4323
+size 344
