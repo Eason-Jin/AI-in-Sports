@@ -169,7 +169,7 @@ if __name__ == '__main__':
     print('Running PCMCI')
     results = pcmci.run_pcmci(tau_max=TAU_MAX, pc_alpha=None, alpha_level=0.01)
     q_matrix = pcmci.get_corrected_pvalues(
-        p_matrix=results['p_matrix'], tau_max=8, fdr_method='fdr_bh')
+        p_matrix=results['p_matrix'], tau_max=TAU_MAX, fdr_method='fdr_bh')
     pcmci.print_significant_links(
         p_matrix=q_matrix,
         val_matrix=results['val_matrix'],
