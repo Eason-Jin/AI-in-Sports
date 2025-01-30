@@ -10,10 +10,10 @@ import os
 import sys
 from find import *
 
-print(torch.cuda.get_device_name(0))
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-if device != torch.device('cuda'):
-    raise ValueError("CUDA not available!")
+# print(torch.cuda.get_device_name(0))
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# if device != torch.device('cuda'):
+#     raise ValueError("CUDA not available!")
 
 TAU_MAX = 5
 match_folder = 'match_0'
@@ -26,13 +26,13 @@ players = df['player_id'].unique()
 for player_id in players:
     print(f'Player {player_id}')
     # Extract data for the current player
-    player_df = searchDF(df, [('player_id', player_id)])
+    player_df = searchDF(df, [('player_id', player_id)]).astype(np.float64)
     datatime = player_df['time'].to_numpy()
     var_names = player_df.drop(columns=['player_id', 'time']).columns
 
     # Set up tigramite DataFrame
     dataframe = pp.DataFrame(
-        player_df, datatime=datatime, var_names=var_names)
+        player_df.to_numpy(), datatime=datatime, var_names=var_names)
 
     # Run PCMCI
     pcmci = PCMCI(dataframe=dataframe,
@@ -40,10 +40,10 @@ for player_id in players:
     results = pcmci.run_pcmci(tau_max=TAU_MAX, pc_alpha=None)
     q_matrix = pcmci.get_corrected_pvalues(
         p_matrix=results['p_matrix'], tau_max=TAU_MAX, fdr_method='fdr_bh')
-    pcmci.print_significant_links(
-        p_matrix=q_matrix,
-        val_matrix=results['val_matrix'],
-        alpha_level=0.01)
+    # pcmci.print_significant_links(
+    #     p_matrix=q_matrix,
+    #     val_matrix=results['val_matrix'],
+    #     alpha_level=0.01)
     graph = pcmci.get_graph_from_pmatrix(p_matrix=q_matrix, alpha_level=0.01,
                                          tau_min=0, tau_max=TAU_MAX, link_assumptions=None)
     results['graph'] = graph
