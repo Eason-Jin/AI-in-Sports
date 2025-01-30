@@ -1,0 +1,2124 @@
+mlp_layer_10_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 53.85
+Average precision: 57.69
+Average recall: 53.85
+Average F1-score: 55.38
+
+===============================================================================================================================
+
+mlp_layer_10_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 46.15
+Average precision: 51.92
+Average recall: 46.15
+Average F1-score: 48.87
+
+===============================================================================================================================
+
+mlp_layer_10_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 46.15
+Average precision: 41.54
+Average recall: 46.15
+Average F1-score: 43.72
+
+===============================================================================================================================
+
+mlp_layer_10_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 46.15
+Average precision: 47.88
+Average recall: 46.15
+Average F1-score: 46.49
+
+===============================================================================================================================
+
+mlp_layer_10_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 61.54
+Average recall: 61.54
+Average F1-score: 61.54
+
+===============================================================================================================================
+
+mlp_layer_10_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 38.46
+Average precision: 38.46
+Average recall: 38.46
+Average F1-score: 38.46
+
+===============================================================================================================================
+
+mlp_layer_10_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 50.77
+Average recall: 38.46
+Average F1-score: 42.69
+
+===============================================================================================================================
+
+mlp_layer_10_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 56.15
+Average recall: 61.54
+Average F1-score: 58.7
+
+===============================================================================================================================
+
+mlp_layer_10_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_10_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 30.77
+Average precision: 46.15
+Average recall: 30.77
+Average F1-score: 36.92
+
+===============================================================================================================================
+
+mlp_layer_10_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 46.15
+Average precision: 46.15
+Average recall: 46.15
+Average F1-score: 46.15
+
+===============================================================================================================================
+
+mlp_layer_10_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+		Units: 8	Activation: relu
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 46.15
+Average precision: 51.92
+Average recall: 46.15
+Average F1-score: 48.87
+
+===============================================================================================================================
+
+mlp_layer_11_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_11_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 53.85
+Average recall: 53.85
+Average F1-score: 53.85
+
+===============================================================================================================================
+
+mlp_layer_11_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 30.77
+Average precision: 46.15
+Average recall: 30.77
+Average F1-score: 35.44
+
+===============================================================================================================================
+
+mlp_layer_11_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 53.85
+Average recall: 38.46
+Average F1-score: 44.62
+
+===============================================================================================================================
+
+mlp_layer_11_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 38.46
+Average precision: 38.46
+Average recall: 38.46
+Average F1-score: 38.46
+
+===============================================================================================================================
+
+mlp_layer_11_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 46.15
+Average precision: 49.04
+Average recall: 46.15
+Average F1-score: 47.32
+
+===============================================================================================================================
+
+mlp_layer_11_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 38.46
+Average recall: 38.46
+Average F1-score: 38.46
+
+===============================================================================================================================
+
+mlp_layer_11_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 38.46
+Average precision: 43.41
+Average recall: 38.46
+Average F1-score: 39.74
+
+===============================================================================================================================
+
+mlp_layer_11_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 51.92
+Average recall: 53.85
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_11_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 15.38
+Average precision: 46.15
+Average recall: 15.38
+Average F1-score: 23.08
+
+===============================================================================================================================
+
+mlp_layer_11_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 30.77
+Average precision: 34.62
+Average recall: 30.77
+Average F1-score: 32.58
+
+===============================================================================================================================
+
+mlp_layer_11_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 15.38
+Average precision: 23.08
+Average recall: 15.38
+Average F1-score: 18.46
+
+===============================================================================================================================
+
+mlp_layer_1_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 61.54
+Average precision: 84.62
+Average recall: 61.54
+Average F1-score: 70.77
+
+===============================================================================================================================
+
+mlp_layer_1_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 46.15
+Average precision: 59.34
+Average recall: 46.15
+Average F1-score: 51.92
+
+===============================================================================================================================
+
+mlp_layer_1_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 70.88
+Average recall: 61.54
+Average F1-score: 65.11
+
+===============================================================================================================================
+
+mlp_layer_1_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 81.73
+Average recall: 38.46
+Average F1-score: 45.56
+
+===============================================================================================================================
+
+mlp_layer_1_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 30.77
+Average precision: 42.31
+Average recall: 30.77
+Average F1-score: 31.56
+
+===============================================================================================================================
+
+mlp_layer_1_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 50.35
+Average recall: 61.54
+Average F1-score: 55.38
+
+===============================================================================================================================
+
+mlp_layer_1_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 23.08
+Average precision: 37.18
+Average recall: 23.08
+Average F1-score: 25.15
+
+===============================================================================================================================
+
+mlp_layer_1_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 0.0
+Average precision: 0.0
+Average recall: 0.0
+Average F1-score: 0.0
+
+===============================================================================================================================
+
+mlp_layer_1_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 38.46
+Average precision: 60.0
+Average recall: 38.46
+Average F1-score: 45.33
+
+===============================================================================================================================
+
+mlp_layer_1_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 49.45
+Average recall: 38.46
+Average F1-score: 43.27
+
+===============================================================================================================================
+
+mlp_layer_1_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 73.08
+Average recall: 53.85
+Average F1-score: 61.54
+
+===============================================================================================================================
+
+mlp_layer_1_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 69.23
+Average recall: 53.85
+Average F1-score: 59.34
+
+===============================================================================================================================
+
+mlp_layer_2_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_2_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_2_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_2_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 61.54
+Average precision: 83.65
+Average recall: 61.54
+Average F1-score: 68.55
+
+===============================================================================================================================
+
+mlp_layer_2_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 38.46
+Average precision: 43.27
+Average recall: 38.46
+Average F1-score: 40.72
+
+===============================================================================================================================
+
+mlp_layer_2_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 46.15
+Average precision: 57.69
+Average recall: 46.15
+Average F1-score: 50.11
+
+===============================================================================================================================
+
+mlp_layer_2_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 46.15
+Average precision: 54.07
+Average recall: 46.15
+Average F1-score: 49.04
+
+===============================================================================================================================
+
+mlp_layer_2_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 30.77
+Average precision: 34.62
+Average recall: 30.77
+Average F1-score: 32.58
+
+===============================================================================================================================
+
+mlp_layer_2_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 46.15
+Average precision: 41.54
+Average recall: 46.15
+Average F1-score: 43.72
+
+===============================================================================================================================
+
+mlp_layer_2_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 46.15
+Average precision: 46.15
+Average recall: 46.15
+Average F1-score: 46.15
+
+===============================================================================================================================
+
+mlp_layer_2_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 70.88
+Average recall: 61.54
+Average F1-score: 65.11
+
+===============================================================================================================================
+
+mlp_layer_2_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 46.15
+Average precision: 65.38
+Average recall: 46.15
+Average F1-score: 53.85
+
+===============================================================================================================================
+
+mlp_layer_3_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_3_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 38.46
+Average precision: 43.27
+Average recall: 38.46
+Average F1-score: 40.72
+
+===============================================================================================================================
+
+mlp_layer_3_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 30.77
+Average precision: 39.56
+Average recall: 30.77
+Average F1-score: 34.62
+
+===============================================================================================================================
+
+mlp_layer_3_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 30.77
+Average precision: 34.62
+Average recall: 30.77
+Average F1-score: 32.58
+
+===============================================================================================================================
+
+mlp_layer_3_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 48.46
+Average recall: 53.85
+Average F1-score: 51.01
+
+===============================================================================================================================
+
+mlp_layer_3_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 63.46
+Average recall: 53.85
+Average F1-score: 58.1
+
+===============================================================================================================================
+
+mlp_layer_3_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 43.41
+Average recall: 38.46
+Average F1-score: 39.74
+
+===============================================================================================================================
+
+mlp_layer_3_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_3_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 38.46
+Average precision: 48.13
+Average recall: 38.46
+Average F1-score: 38.9
+
+===============================================================================================================================
+
+mlp_layer_3_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 69.23
+Average precision: 47.93
+Average recall: 69.23
+Average F1-score: 56.64
+
+===============================================================================================================================
+
+mlp_layer_3_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 30.77
+Average precision: 34.62
+Average recall: 30.77
+Average F1-score: 32.58
+
+===============================================================================================================================
+
+mlp_layer_3_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 61.15
+Average recall: 61.54
+Average F1-score: 60.41
+
+===============================================================================================================================
+
+mlp_layer_4_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 38.46
+Average recall: 38.46
+Average F1-score: 38.46
+
+===============================================================================================================================
+
+mlp_layer_4_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 23.08
+Average precision: 29.67
+Average recall: 23.08
+Average F1-score: 25.96
+
+===============================================================================================================================
+
+mlp_layer_4_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 23.08
+Average precision: 37.5
+Average recall: 23.08
+Average F1-score: 25.5
+
+===============================================================================================================================
+
+mlp_layer_4_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 30.77
+Average precision: 37.91
+Average recall: 30.77
+Average F1-score: 32.31
+
+===============================================================================================================================
+
+mlp_layer_4_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 30.77
+Average precision: 51.28
+Average recall: 30.77
+Average F1-score: 30.77
+
+===============================================================================================================================
+
+mlp_layer_4_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 38.46
+Average precision: 57.05
+Average recall: 38.46
+Average F1-score: 39.64
+
+===============================================================================================================================
+
+mlp_layer_4_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 15.38
+Average precision: 25.38
+Average recall: 15.38
+Average F1-score: 15.09
+
+===============================================================================================================================
+
+mlp_layer_4_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 46.15
+Average precision: 41.54
+Average recall: 46.15
+Average F1-score: 43.72
+
+===============================================================================================================================
+
+mlp_layer_4_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 23.08
+Average precision: 29.67
+Average recall: 23.08
+Average F1-score: 25.96
+
+===============================================================================================================================
+
+mlp_layer_4_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 23.08
+Average precision: 29.67
+Average recall: 23.08
+Average F1-score: 25.96
+
+===============================================================================================================================
+
+mlp_layer_4_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 38.46
+Average precision: 38.46
+Average recall: 38.46
+Average F1-score: 38.46
+
+===============================================================================================================================
+
+mlp_layer_4_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 256	Activation: relu
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 48.46
+Average recall: 53.85
+Average F1-score: 51.01
+
+===============================================================================================================================
+
+mlp_layer_5_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 30.77
+Average precision: 56.54
+Average recall: 30.77
+Average F1-score: 37.72
+
+===============================================================================================================================
+
+mlp_layer_5_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 76.92
+Average precision: 84.62
+Average recall: 76.92
+Average F1-score: 80.0
+
+===============================================================================================================================
+
+mlp_layer_5_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 30.77
+Average precision: 40.38
+Average recall: 30.77
+Average F1-score: 34.29
+
+===============================================================================================================================
+
+mlp_layer_5_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 0.0
+Average precision: 0.0
+Average recall: 0.0
+Average F1-score: 0.0
+
+===============================================================================================================================
+
+mlp_layer_5_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 7.69
+Average precision: 5.77
+Average recall: 7.69
+Average F1-score: 6.59
+
+===============================================================================================================================
+
+mlp_layer_5_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 48.46
+Average recall: 53.85
+Average F1-score: 51.01
+
+===============================================================================================================================
+
+mlp_layer_5_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 23.08
+Average precision: 34.62
+Average recall: 23.08
+Average F1-score: 27.69
+
+===============================================================================================================================
+
+mlp_layer_5_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 46.15
+Average precision: 50.96
+Average recall: 46.15
+Average F1-score: 48.42
+
+===============================================================================================================================
+
+mlp_layer_5_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 53.85
+Average recall: 53.85
+Average F1-score: 53.85
+
+===============================================================================================================================
+
+mlp_layer_5_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 53.85
+Average precision: 53.85
+Average recall: 53.85
+Average F1-score: 53.85
+
+===============================================================================================================================
+
+mlp_layer_5_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 48.46
+Average recall: 53.85
+Average F1-score: 51.01
+
+===============================================================================================================================
+
+mlp_layer_5_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: tanh
+		Units: 64	Activation: tanh
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 46.15
+Average precision: 63.08
+Average recall: 46.15
+Average F1-score: 49.82
+
+===============================================================================================================================
+
+mlp_layer_6_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 53.85
+Average precision: 60.99
+Average recall: 53.85
+Average F1-score: 56.46
+
+===============================================================================================================================
+
+mlp_layer_6_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 30.77
+Average precision: 46.15
+Average recall: 30.77
+Average F1-score: 36.92
+
+===============================================================================================================================
+
+mlp_layer_6_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 65.38
+Average recall: 61.54
+Average F1-score: 63.08
+
+===============================================================================================================================
+
+mlp_layer_6_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 56.48
+Average recall: 38.46
+Average F1-score: 41.48
+
+===============================================================================================================================
+
+mlp_layer_6_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 30.77
+Average precision: 76.92
+Average recall: 30.77
+Average F1-score: 35.43
+
+===============================================================================================================================
+
+mlp_layer_6_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 38.46
+Average precision: 43.27
+Average recall: 38.46
+Average F1-score: 40.72
+
+===============================================================================================================================
+
+mlp_layer_6_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 57.69
+Average recall: 38.46
+Average F1-score: 46.15
+
+===============================================================================================================================
+
+mlp_layer_6_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 61.54
+Average recall: 61.54
+Average F1-score: 61.54
+
+===============================================================================================================================
+
+mlp_layer_6_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 59.62
+Average recall: 53.85
+Average F1-score: 56.56
+
+===============================================================================================================================
+
+mlp_layer_6_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 46.15
+Average precision: 66.92
+Average recall: 46.15
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_6_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_6_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: sigmoid
+		Units: 32	Activation: sigmoid
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 69.23
+Average precision: 72.12
+Average recall: 69.23
+Average F1-score: 70.2
+
+===============================================================================================================================
+
+mlp_layer_7_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 61.54
+Average precision: 60.0
+Average recall: 61.54
+Average F1-score: 60.24
+
+===============================================================================================================================
+
+mlp_layer_7_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 46.15
+Average precision: 41.54
+Average recall: 46.15
+Average F1-score: 43.72
+
+===============================================================================================================================
+
+mlp_layer_7_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 69.23
+Average precision: 78.46
+Average recall: 69.23
+Average F1-score: 69.84
+
+===============================================================================================================================
+
+mlp_layer_7_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 58.52
+Average recall: 38.46
+Average F1-score: 41.18
+
+===============================================================================================================================
+
+mlp_layer_7_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 38.46
+Average precision: 51.92
+Average recall: 38.46
+Average F1-score: 43.52
+
+===============================================================================================================================
+
+mlp_layer_7_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_7_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 60.0
+Average recall: 38.46
+Average F1-score: 45.33
+
+===============================================================================================================================
+
+mlp_layer_7_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 30.77
+Average precision: 34.62
+Average recall: 30.77
+Average F1-score: 32.58
+
+===============================================================================================================================
+
+mlp_layer_7_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 48.46
+Average recall: 53.85
+Average F1-score: 51.01
+
+===============================================================================================================================
+
+mlp_layer_7_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 43.27
+Average recall: 38.46
+Average F1-score: 40.72
+
+===============================================================================================================================
+
+mlp_layer_7_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_7_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: relu
+		Units: 16	Activation: relu
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 23.08
+Average precision: 41.54
+Average recall: 23.08
+Average F1-score: 29.67
+
+===============================================================================================================================
+
+mlp_layer_8_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 69.23
+Average precision: 61.89
+Average recall: 69.23
+Average F1-score: 64.62
+
+===============================================================================================================================
+
+mlp_layer_8_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 61.15
+Average recall: 61.54
+Average F1-score: 60.41
+
+===============================================================================================================================
+
+mlp_layer_8_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 46.15
+Average precision: 46.15
+Average recall: 46.15
+Average F1-score: 46.15
+
+===============================================================================================================================
+
+mlp_layer_8_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_8_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 69.23
+Average precision: 61.89
+Average recall: 69.23
+Average F1-score: 64.62
+
+===============================================================================================================================
+
+mlp_layer_8_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_8_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 61.54
+Average precision: 50.35
+Average recall: 61.54
+Average F1-score: 55.38
+
+===============================================================================================================================
+
+mlp_layer_8_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_8_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_8_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 69.23
+Average precision: 47.93
+Average recall: 69.23
+Average F1-score: 56.64
+
+===============================================================================================================================
+
+mlp_layer_8_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_8_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 64	Activation: relu
+		Units: 64	Activation: tanh
+		Units: 32	Activation: relu
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_9_100_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 100
+	Batch size: 10
+
+Accuracy: 38.46
+Average precision: 38.46
+Average recall: 38.46
+Average F1-score: 38.46
+
+===============================================================================================================================
+
+mlp_layer_9_100_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 100
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_9_100_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 100
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+
+mlp_layer_9_20_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 20
+	Batch size: 10
+
+Accuracy: 46.15
+Average precision: 49.04
+Average recall: 46.15
+Average F1-score: 47.32
+
+===============================================================================================================================
+
+mlp_layer_9_20_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 20
+	Batch size: 20
+
+Accuracy: 69.23
+Average precision: 75.96
+Average recall: 69.23
+Average F1-score: 72.4
+
+===============================================================================================================================
+
+mlp_layer_9_20_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 20
+	Batch size: 8
+
+Accuracy: 30.77
+Average precision: 39.56
+Average recall: 30.77
+Average F1-score: 34.62
+
+===============================================================================================================================
+
+mlp_layer_9_30_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 30
+	Batch size: 10
+
+Accuracy: 46.15
+Average precision: 41.54
+Average recall: 46.15
+Average F1-score: 43.72
+
+===============================================================================================================================
+
+mlp_layer_9_30_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 30
+	Batch size: 20
+
+Accuracy: 61.54
+Average precision: 61.54
+Average recall: 61.54
+Average F1-score: 61.54
+
+===============================================================================================================================
+
+mlp_layer_9_30_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 30
+	Batch size: 8
+
+Accuracy: 61.54
+Average precision: 46.15
+Average recall: 61.54
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_9_50_10.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 50
+	Batch size: 10
+
+Accuracy: 61.54
+Average precision: 68.57
+Average recall: 61.54
+Average F1-score: 63.46
+
+===============================================================================================================================
+
+mlp_layer_9_50_20.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 50
+	Batch size: 20
+
+Accuracy: 53.85
+Average precision: 51.92
+Average recall: 53.85
+Average F1-score: 52.75
+
+===============================================================================================================================
+
+mlp_layer_9_50_8.joblib
+Parameters:
+	Layers: 
+		Units: 128	Activation: relu
+		Units: 64	Activation: relu
+		Units: 32	Activation: sigmoid
+	Epochs: 50
+	Batch size: 8
+
+Accuracy: 53.85
+Average precision: 44.06
+Average recall: 53.85
+Average F1-score: 48.46
+
+===============================================================================================================================
+

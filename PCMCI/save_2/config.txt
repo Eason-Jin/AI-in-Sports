@@ -1,0 +1,88 @@
+# The original
+TAU_MAX = 5
+save_folder = 'save_2'
+
+parcorr = ParCorr(significance='analytic')
+
+pcmci = PCMCI(dataframe=tigramite_df, cond_ind_test=parcorr, verbosity=1)
+
+with open(f'{save_folder}/pcmci.pkl', 'wb') as f:
+    pickle.dump(pcmci, f)
+
+correlations = pcmci.get_lagged_dependencies(tau_max=TAU_MAX, val_only=True)['val_matrix']
+
+lag_func_matrix = tp.plot_lagfuncs(val_matrix=correlations, setup_args={'var_names':var_names, 
+                                    'x_base':5, 'y_base':.5}); plt.show()
+plt.savefig(f'{save_folder}/lagfuncs.png')
+
+results = pcmci.run_pcmci(tau_max=TAU_MAX, pc_alpha=None, alpha_level=0.01)
+
+q_matrix = pcmci.get_corrected_pvalues(p_matrix=results['p_matrix'], tau_max=8, fdr_method='fdr_bh')
+
+pcmci.print_significant_links(
+        p_matrix = q_matrix,
+        val_matrix = results['val_matrix'],
+        alpha_level = 0.01)
+
+graph = pcmci.get_graph_from_pmatrix(p_matrix=q_matrix, alpha_level=0.01, 
+            tau_min=0, tau_max=TAU_MAX, link_assumptions=None)
+
+results['graph'] = graph
+
+with open(f'{save_folder}/results.pkl', 'wb') as f:
+    pickle.dump(results, f)
+
+tp.plot_graph(
+    val_matrix=results['val_matrix'],
+    graph=results['graph'],
+    var_names=var_names,
+    link_colorbar_label='cross-MCI',
+    node_colorbar_label='auto-MCI',
+    show_autodependency_lags=False
+    );
+plt.savefig(f'{save_folder}/graph.png')
+
+tp.plot_time_series_graph(
+    figsize=(6, 4),
+    val_matrix=results['val_matrix'],
+    graph=results['graph'],
+    var_names=var_names,
+    link_colorbar_label='MCI',
+    );
+plt.savefig(f'{save_folder}/time_series_graph.png')
+
+tp.write_csv(
+    val_matrix=results['val_matrix'],
+    graph=results['graph'],
+    var_names=var_names,
+    save_name=f'{save_folder}/links.csv',
+    digits=5,
+)
+
+results = pickle.load(open(f'{save_folder}/results.pkl', 'rb'))
+
+graph = results['graph']
+
+T = list(tigramite_df.T.values())[0]
+
+pred = Prediction(dataframe=tigramite_df,
+        cond_ind_test=ParCorr(),   #CMIknn ParCorr
+        prediction_model = sklearn.linear_model.LinearRegression(),
+    data_transform=sklearn.preprocessing.StandardScaler(),
+    train_indices= range(int(0.8*T)),
+    test_indices= range(int(0.9*T), T),
+    verbosity=1
+    )
+target = 3  # 3rd column is behaviour
+predictors = pred.get_predictors(
+                  selected_targets=[target],
+                  steps_ahead=1,
+                  tau_max=TAU_MAX,
+                  pc_alpha=None
+                  )
+pred.fit(target_predictors=predictors, 
+                selected_targets=[target],
+                    tau_max=TAU_MAX)
+
+predicted = pred.predict(target)
+true_data = pred.get_test_array(j=target)[0]
