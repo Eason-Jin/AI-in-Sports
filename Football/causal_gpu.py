@@ -30,6 +30,7 @@ all_player_results = {}
 
 print('Starting PCMCI')
 players = df['player_id'].unique()
+# players =[24]
 for player_id in players:
     print(f'Player {player_id}')
     # Extract data for the current player
@@ -48,16 +49,21 @@ for player_id in players:
     results = pcmci.run_pcmci(tau_max=TAU_MAX, pc_alpha=None)
     q_matrix = pcmci.get_corrected_pvalues(
         p_matrix=results['p_matrix'], tau_max=TAU_MAX, fdr_method='fdr_bh')
-    # pcmci.print_significant_links(
-    #     p_matrix=q_matrix,
-    #     val_matrix=results['val_matrix'],
-    #     alpha_level=0.01)
+    
     graph = pcmci.get_graph_from_pmatrix(p_matrix=q_matrix, alpha_level=0.01,
                                          tau_min=0, tau_max=TAU_MAX)
     results['graph'] = graph
     
-    # print("Lag-zero slice of graph:")
-    # print(graph[:, :, 0])
+    # val_matrix = results['val_matrix']
+    # width, height, depth = val_matrix.shape
+    # with open(f'Football/matches/{match_folder}/graphs/val_matrix_{player_id}.txt', 'w') as f:
+    #     for d in range(depth):
+    #         f.write(f'Depth {d}\n')
+    #         for h in range(height):
+    #             for w in range(width):
+    #                 f.write(f'{val_matrix[w, h, d]} ')
+    #             f.write('\n')
+    # sys.exit(0)
 
     all_player_results[player_id] = results
 
