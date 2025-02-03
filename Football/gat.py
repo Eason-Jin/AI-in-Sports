@@ -114,9 +114,6 @@ model.eval()
 out = model(data.x, data.edge_index, data.edge_attr)
 y_pred = out.argmax(dim=1)
 y_true = data.y
-accuracy = accuracy_score(y_true, y_pred)
-precision = precision_score(y_true, y_pred, average='weighted')
-recall = recall_score(y_true, y_pred, average='weighted')
-f1 = f1_score(y_true, y_pred, average='weighted')
-print(f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}')
-# Accuracy: 0.5560, Precision: 0.4025, Recall: 0.5560, F1-score: 0.4362
+printMetrics(y_true, y_pred)
+# Accuracy: 0.5560, Precision: 0.4025, Recall: 0.5560, F1-score: 0.4362 (with weight adjustment)
+# Accuracy: 0.5630, Precision: 0.4324, Recall: 0.5630, F1-score: 0.4412 (no weight adjustment)
