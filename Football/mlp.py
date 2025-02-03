@@ -7,13 +7,9 @@ from common import *
 from sklearn.model_selection import train_test_split
 
 LAYERS = [
-    [128, 'relu']
-    # [64, 'tanh'],
-    # [32, 'sigmoid']
+    [128, 'relu'],
+    [64, 'sigmoid']
 ]
-OPTIMISER = 'adam'
-LOSS = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-METRICS = ['accuracy']
 EPOCHS = 100
 BATCH_SIZE = 32
 
@@ -63,7 +59,7 @@ for (i, j, lag), value in weights_dict.items():
 # Set updated weights
 model.layers[0].set_weights([weight_matrix, bias])
 
-model.compile(optimizer=OPTIMISER, loss=LOSS, metrics=METRICS)
+model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
 model.fit(X, y, epochs=EPOCHS, batch_size=BATCH_SIZE)
 y_pred = model.predict(x_test)
 p = np.argmax(y_pred, axis=1)
@@ -75,5 +71,11 @@ recall = recall_score(y_test, p, average='weighted')
 f1 = f1_score(y_test, p, average='weighted')
 print(
     f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}')
-# Accuracy: 0.6950, Precision: 0.6597, Recall: 0.6950, F1-score: 0.6369 (with weight adjustment)
-# Accuracy: 0.6450, Precision: 0.5869, Recall: 0.6450, F1-score: 0.5708 (no weight adjustment)
+
+
+# [128, relu], [64, sigmoid]
+# Accuracy: 0.7200, Precision: 0.6779, Recall: 0.7200, F1-score: 0.6648 (with weight adjustment)
+# Accuracy: 0.6900, Precision: 0.6685, Recall: 0.6900, F1-score: 0.6368 (no weight adjustment)
+
+# [256, relu], [128, sigmoid]
+# Accuracy: 0.8250, Precision: 0.7956, Recall: 0.8250, F1-score: 0.7942 (with weight adjustment)
