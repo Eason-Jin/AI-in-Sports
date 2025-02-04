@@ -162,7 +162,8 @@ def aggregateLinks(match_folder=None):
     return graph, val_matrix
 
 if __name__ == '__main__':
-    # runPCMCI(match_folder)
+    match_folder = 'match_1'
+    runPCMCI(match_folder)
     aggregateLinks()
 
 # Prediction

@@ -4,6 +4,7 @@ import numpy as np
 from common import *
 
 def matchData():
+    # Splits the match data into individual matches and saves them in separate folders
     df = pd.read_csv('match_event.csv')
     # Only consider events that are successful
     df = searchDF(df, [('is_success', 't')])
@@ -72,7 +73,7 @@ def matchData():
         match_df.to_csv(f'matches/match_{match_id}/match_data.csv', index=False)
 
 
-def causalData():
+def causalData(match_folder):
     df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
     df = df.drop(columns=['id', 'event',
                           'action_result', 'x_begin', 'y_begin', 'x_end', 'y_end'])
@@ -102,7 +103,7 @@ def causalData():
     return new_df
 
 
-def gatData():
+def gatData(match_folder):
     # time, x_begin, y_begin, x_end, y_end, prev_action, time_lag, action(prediction)
     df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
     df = df.drop(columns=['id', 'event', 'action_result'])
@@ -125,6 +126,8 @@ def gatData():
     df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
     return df
 
-# matchData()
-# causalData()
-gatData()
+if __name__ == '__main__':
+    match_folder = 'match_1'
+    # matchData()
+    # causalData(mtach_folder)
+    gatData(match_folder)
