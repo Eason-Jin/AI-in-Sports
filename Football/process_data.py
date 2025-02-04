@@ -124,3 +124,7 @@ def gatData():
     df['action'] = action_column
     df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
     return df
+
+# matchData()
+# causalData()
+gatData()

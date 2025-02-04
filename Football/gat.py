@@ -55,19 +55,19 @@ weight_matrix = torch.zeros(data.edge_index.shape[1], dtype=torch.float32)
 action_df = pd.read_csv('fkeys/action.csv')
 action_map = {action_df['action'][i]: action_df['id'][i]
               for i in range(len(action_df))}
-for _, row in link_file.iterrows():
-    i = action_map[row['Variable i']]
-    j = action_map[row['Variable j']]
-    time_lag = int(row['Time lag of i'])
-    link_value = float(row['Link value'])
+# for _, row in link_file.iterrows():
+#     i = action_map[row['Variable i']]
+#     j = action_map[row['Variable j']]
+#     time_lag = int(row['Time lag of i'])
+#     link_value = float(row['Link value'])
 
-    # Find edges with the same time_lag and set weights
-    mask = (data.edge_attr == time_lag).cpu().numpy()
-    edges_with_time_lag = data.edge_index[:, mask].cpu().numpy()
+#     # Find edges with the same time_lag and set weights
+#     mask = (data.edge_attr == time_lag).cpu().numpy()
+#     edges_with_time_lag = data.edge_index[:, mask].cpu().numpy()
 
-    for edge in edges_with_time_lag.T:
-        if edge[0] == i and edge[1] == j:
-            weight_matrix[mask] = link_value
+#     for edge in edges_with_time_lag.T:
+#         if edge[0] == i and edge[1] == j:
+#             weight_matrix[mask] = link_value
 
 data.edge_attr = weight_matrix
 
