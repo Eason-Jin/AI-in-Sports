@@ -4,6 +4,7 @@ import tensorflow as tf
 import numpy as np
 import pandas as pd
 from common import *
+from process_data import *
 from sklearn.model_selection import train_test_split
 
 LAYERS = [
@@ -79,3 +80,4 @@ print(
 
 # [256, relu], [128, sigmoid]
 # Accuracy: 0.8250, Precision: 0.7956, Recall: 0.8250, F1-score: 0.7942 (with weight adjustment)
+# No weight adjustment yields similar results

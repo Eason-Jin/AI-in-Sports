@@ -10,36 +10,7 @@ from tigramite import plotting as tp
 import os
 import sys
 from common import *
-
-
-# Process data
-df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
-df = df.drop(columns=['id', 'event',
-             'action_result', 'x_begin', 'y_begin', 'x_end', 'y_end'])
-
-action_df = pd.read_csv('fkeys/action.csv')
-action_map = {action_df['action'][i]: action_df['id'][i]
-              for i in range(len(action_df))}
-columns = ['player_id', 'time']
-columns.extend(action_df['action'].values)
-new_df = pd.DataFrame(columns=columns)
-min_time = df['time'].min()
-max_time = df['time'].max()
-
-player_ids = df['player_id'].unique()
-for player_id in player_ids:
-    temp_df = pd.DataFrame(columns=columns)
-    temp_df['player_id'] = [player_id]*((max_time-min_time)+1)
-    temp_df['time'] = np.arange(min_time, max_time+1)
-    temp_df = temp_df.fillna(0)
-    # perform one hot encoding of action at respective times
-    player_df = searchDF(df, [('player_id', player_id)])
-    for index, row in player_df.iterrows():
-        action = row['action']
-        time = row['time']
-        temp_df.loc[temp_df['time'] == time, action_df['action'][action]] = 1
-    new_df = pd.concat([new_df, temp_df], ignore_index=True)
-new_df.to_csv('matches/match_0/match_data_causal.csv', index=False)
+from process_data import *
 
 
 df = pd.read_csv(f'Football/matches/{match_folder}/match_data_causal.csv')
