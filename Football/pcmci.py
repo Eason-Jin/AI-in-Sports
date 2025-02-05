@@ -162,9 +162,9 @@ def aggregateLinks(match_folder=None):
     return graph, val_matrix
 
 if __name__ == '__main__':
-    match_folder = 'match_1'
+    match_folder = 'match_0'
     runPCMCI(match_folder)
-    aggregateLinks()
+    aggregateLinks(match_folder)
 
 # Prediction
 # temp_df = df.drop(columns=['player_id', 'time'])

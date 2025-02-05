@@ -5,8 +5,8 @@ import os
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-TAU_MAX = 5
-match_folder = 'match_0'
+TAU_MAX = 10
+# match_folder = 'match_0'
 
 
 def apply_conditions(df, conditions):

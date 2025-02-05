@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from common import *
 
+
 def matchData():
     # Splits the match data into individual matches and saves them in separate folders
     df = pd.read_csv('match_event.csv')
@@ -16,7 +17,7 @@ def matchData():
 
     match_period = df['matchperiod'].unique()
     match_map = {'1H': 1,
-                '2H': 2}
+                 '2H': 2}
 
     event_df = pd.DataFrame(columns=['id', 'event'])
     events = df['eventname'].unique()
@@ -62,15 +63,18 @@ def matchData():
         first_half = match_df[match_df['match_period'] == 1]
         max_time = first_half['time'].max()
         match_df.loc[match_df['match_period'] == 2, 'time'] += max_time
-        match_df = match_df.drop(columns=['match_id', 'match_period', 'club_id'])
+        match_df = match_df.drop(
+            columns=['match_id', 'match_period', 'club_id'])
         min_time = match_df['time'].min()
         match_df['time'] -= min_time
-        match_df['time'] = match_df['time']//60  # convert to minutes
+        # convert to minutes
+        match_df['time'] = (match_df['time'] / 60).round().astype(int)
         match_df = match_df.sort_values(by=['player_id', 'time'])
         path = f'matches/match_{match_id}'
         if not os.path.exists(path):
             os.makedirs(path)
-        match_df.to_csv(f'matches/match_{match_id}/match_data.csv', index=False)
+        match_df.to_csv(
+            f'matches/match_{match_id}/match_data.csv', index=False)
 
 
 def causalData(match_folder):
@@ -103,7 +107,7 @@ def causalData(match_folder):
     return new_df
 
 
-def gatData(match_folder):
+def mlpData(match_folder):
     # time, x_begin, y_begin, x_end, y_end, prev_action, time_lag, action(prediction)
     df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
     df = df.drop(columns=['id', 'event', 'action_result'])
@@ -123,11 +127,55 @@ def gatData(match_folder):
         df = df.drop(indices[0])
     df = df.drop(columns=['time', 'player_id'])
     df['action'] = action_column
-    df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
+    df.to_csv(f'matches/{match_folder}/match_data_mlp.csv', index=False)
     return df
 
+
+def gatData(match_folder):
+    if not os.path.exists(f'matches/{match_folder}/match_data_causal.csv'):
+        causalData(match_folder)
+    df = pd.read_csv(f'matches/{match_folder}/match_data_causal.csv')
+    columns = [f'action_(t-{TAU_MAX-i})' for i in range(TAU_MAX)]
+    columns.extend(['result'])
+    results = []
+    # read TAU_MAX+1 rows at a time
+    for index in range(TAU_MAX, len(df)):
+        temp_df = df.iloc[index-TAU_MAX:index+1]
+        actions = []
+        skip = False
+        for i in range(len(temp_df)):
+            action = list(np.where(temp_df.iloc[i, 2:] == 1)[0])
+            if len(action) == 0 and i == 0:
+                skip = True
+                break
+            # Interpolate missing actions
+            actions.append(action if len(action) > 0 else actions[i-1])
+        if not skip:
+            results = expand_2d_list(results, actions)
+    gat_df = pd.DataFrame(results, columns=columns)
+    gat_df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
+
+
+def expand_2d_list(results, lst):
+    # Base case: if every element in lst is length 1, return lst as 1 list
+    if all([len(elem) == 1 for elem in lst]):
+        results.append( [elem[0] for elem in lst])
+    # Recursive case:
+    else:
+        # Find the first element in lst that is not length 1
+        for i, elem in enumerate(lst):
+            if len(elem) != 1:
+                # For each element in elem, create a new list with that element
+                for item in elem:
+                    new_lst = lst.copy()
+                    new_lst[i] = [item]
+                    expand_2d_list(results, new_lst)
+                break
+    return results
+
 if __name__ == '__main__':
-    match_folder = 'match_1'
+    match_folder = 'match_0'
     # matchData()
-    # causalData(mtach_folder)
+    # causalData(match_folder)
+    # mlpData(match_folder)
     gatData(match_folder)

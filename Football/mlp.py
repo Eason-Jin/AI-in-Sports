@@ -9,15 +9,15 @@ from sklearn.model_selection import train_test_split
 
 
 def runMLP(layers, epochs, batch_size, weight_adjustment=True):
-    # Go through all subfolders under matches and if they contain match_data_gat.csv add it to df, otherwise skip
     match_folders = [f for f in os.listdir(
         'matches') if os.path.isdir(os.path.join('matches', f))]
-    df = pd.DataFrame()
+    df_list = []
     for match_folder in match_folders:
         if os.path.exists(f'matches/{match_folder}/match_data_gat.csv'):
             print(f'Processing {match_folder}')
-            temp_df = pd.read_csv(f'matches/{match_folder}/match_data_gat.csv')
-            df = pd.concat([df, temp_df], ignore_index=True)
+            df_list.append(pd.read_csv(
+                f'matches/{match_folder}/match_data_gat.csv'))
+    df = pd.concat(df_list, ignore_index=True)
 
     action_df = pd.read_csv('fkeys/action.csv')
     action_map = {action_df['action'][i]: action_df['id'][i]
@@ -76,15 +76,6 @@ def runMLP(layers, epochs, batch_size, weight_adjustment=True):
     return model
 
 
-def printMetrics(y_true, y_pred):
-    accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, average='weighted')
-    recall = recall_score(y_true, y_pred, average='weighted')
-    f1 = f1_score(y_true, y_pred, average='weighted')
-    print(
-        f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}')
-
-
 # [128, relu], [64, sigmoid]
 # Accuracy: 0.7200, Precision: 0.6779, Recall: 0.7200, F1-score: 0.6648 (with weight adjustment)
 # Accuracy: 0.6900, Precision: 0.6685, Recall: 0.6900, F1-score: 0.6368 (no weight adjustment)
@@ -95,9 +86,9 @@ def printMetrics(y_true, y_pred):
 
 if __name__ == '__main__':
     LAYERS = [
-        [128, 'relu'],
-        [64, 'sigmoid']
+        [64, 'leaky_relu'],
+        [32, 'softmax']
     ]
-    EPOCHS = 200
+    EPOCHS = 100
     BATCH_SIZE = 32
     runMLP(LAYERS, EPOCHS, BATCH_SIZE, weight_adjustment=True)
