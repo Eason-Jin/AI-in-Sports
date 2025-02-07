@@ -159,7 +159,7 @@ def gatData(match_folder):
 def expand_2d_list(results, lst):
     # Base case: if every element in lst is length 1, return lst as 1 list
     if all([len(elem) == 1 for elem in lst]):
-        results.append( [elem[0] for elem in lst])
+        results.append([elem[0] for elem in lst])
     # Recursive case:
     else:
         # Find the first element in lst that is not length 1
@@ -173,9 +173,13 @@ def expand_2d_list(results, lst):
                 break
     return results
 
+
 if __name__ == '__main__':
-    match_folder = 'match_0'
     # matchData()
-    # causalData(match_folder)
-    # mlpData(match_folder)
-    gatData(match_folder)
+    max_match_folder = 10
+    for m in range(max_match_folder):
+        print(f'Processing match_{m}')
+        match_folder = f'match_{m}'
+        causalData(match_folder)
+        # mlpData(match_folder)
+        gatData(match_folder)

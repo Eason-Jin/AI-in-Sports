@@ -161,10 +161,16 @@ def aggregateLinks(match_folder=None):
     print('Graph saved')
     return graph, val_matrix
 
+
 if __name__ == '__main__':
-    match_folder = 'match_0'
-    runPCMCI(match_folder)
-    aggregateLinks(match_folder)
+    max_match_folder = 10
+    for m in range(max_match_folder):
+        print(f'PCMCI on match_{m}')
+        match_folder = f'match_{m}'
+        runPCMCI(match_folder)
+    graph, val_matrix = aggregateLinks()
+    pickle.dump(graph, open('graph.pkl', 'wb'))
+    pickle.dump(val_matrix, open('val_matrix.pkl', 'wb'))
 
 # Prediction
 # temp_df = df.drop(columns=['player_id', 'time'])
