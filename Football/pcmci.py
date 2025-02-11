@@ -16,90 +16,88 @@ from process_data import *
 import matplotlib.pyplot as plt
 
 
-def runPCMCI(match_folder, save_graphs=False, save_time_series_graphs=False, save_results=False):
-    df = pd.read_csv(f'matches/{match_folder}/match_data_causal.csv')
+def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save_result=False):
+    df = pd.DataFrame()
+    for folder in folder_list:
+        print(f'Processing {folder}')
+        df = pd.concat(
+            [df, pd.read_csv(f'matches/{folder}/match_data_causal.csv')])
+    print('Data loaded')
 
-    if not os.path.exists(f'matches/{match_folder}/graphs') and save_graphs:
-        os.makedirs(f'matches/{match_folder}/graphs')
-    if not os.path.exists(f'matches/{match_folder}/links'):
-        os.makedirs(f'matches/{match_folder}/links')
-    if not os.path.exists(f'matches/{match_folder}/time_series_graphs') and save_time_series_graphs:
-        os.makedirs(f'matches/{match_folder}/time_series_graphs')
+    # if not os.path.exists(f'matches/{match_folder}/graphs') and save_graphs:
+    #     os.makedirs(f'matches/{match_folder}/graphs')
+    # if not os.path.exists(f'matches/{match_folder}/links'):
+    #     os.makedirs(f'matches/{match_folder}/links')
+    # if not os.path.exists(f'matches/{match_folder}/time_series_graphs') and save_time_series_graphs:
+    #     os.makedirs(f'matches/{match_folder}/time_series_graphs')
 
-    all_player_results = {}
-
+    # all_player_results = {}
+    df = df.astype(np.float64)
     print('Starting PCMCI')
-    players = df['player_id'].unique()
-    for player_id in players:
-        print(f'Player {player_id}')
-        # Extract data for the current player
-        player_df = searchDF(df, [('player_id', player_id)]).astype(np.float64)
-        datatime = player_df['time'].to_numpy()
-        player_df = player_df.drop(columns=['player_id', 'time'])
-        var_names = player_df.columns
+    datatime = df['time'].to_numpy()
+    df = df.drop(columns=['player_id', 'time'])
+    var_names = df.columns
 
-        # Set up tigramite DataFrame
-        dataframe = pp.DataFrame(
-            player_df.to_numpy(), datatime=datatime, var_names=var_names)
+    # Set up tigramite DataFrame
+    dataframe = pp.DataFrame(
+        df.to_numpy(), datatime=datatime, var_names=var_names)
 
-        # Run PCMCI
-        pcmci = PCMCI(dataframe=dataframe,
-                      cond_ind_test=ParCorr(significance='analytic'))
-        results = pcmci.run_pcmci(tau_max=TAU_MAX, pc_alpha=None)
-        q_matrix = pcmci.get_corrected_pvalues(
-            p_matrix=results['p_matrix'], tau_max=TAU_MAX, fdr_method='fdr_bh')
+    # Run PCMCI
+    pcmci = PCMCI(dataframe=dataframe,
+                  cond_ind_test=ParCorr(significance='analytic'))
+    result = pcmci.run_pcmci(tau_max=TAU_MAX, pc_alpha=None)
+    q_matrix = pcmci.get_corrected_pvalues(
+        p_matrix=result['p_matrix'], tau_max=TAU_MAX, fdr_method='fdr_bh')
 
-        graph = pcmci.get_graph_from_pmatrix(p_matrix=q_matrix, alpha_level=0.01,
-                                             tau_min=0, tau_max=TAU_MAX)
-        results['graph'] = graph
+    graph = pcmci.get_graph_from_pmatrix(p_matrix=q_matrix, alpha_level=0.01,
+                                         tau_min=0, tau_max=TAU_MAX)
+    result['graph'] = graph
 
-        all_player_results[player_id] = results
+    if save_graphs:
+        tp.plot_graph(
+            val_matrix=result['val_matrix'],
+            graph=result['graph'],
+            var_names=var_names,
+            link_colorbar_label='cross-MCI',
+            node_colorbar_label='auto-MCI',
+            show_autodependency_lags=False,
+            save_name=f'graph.png'
+        )
 
-        if save_graphs:
-            tp.plot_graph(
-                val_matrix=results['val_matrix'],
-                graph=results['graph'],
-                var_names=var_names,
-                link_colorbar_label='cross-MCI',
-                node_colorbar_label='auto-MCI',
-                show_autodependency_lags=False,
-                save_name=f'matches/{match_folder}/graphs/graph_{player_id}.png'
-            )
+    if save_time_series_graphs:
+        tp.plot_time_series_graph(
+            figsize=(6, 4),
+            val_matrix=result['val_matrix'],
+            graph=result['graph'],
+            var_names=var_names,
+            link_colorbar_label='MCI',
+            save_name=f'time_series_graph.png'
+        )
 
-        if save_time_series_graphs:
-            tp.plot_time_series_graph(
-                figsize=(6, 4),
-                val_matrix=results['val_matrix'],
-                graph=results['graph'],
-                var_names=var_names,
-                link_colorbar_label='MCI',
-                save_name=f'matches/{match_folder}/time_series_graphs/time_series_graph_{player_id}.png'
-            )
+    try:
+        tp.write_csv(
+            val_matrix=result['val_matrix'],
+            graph=result['graph'],
+            var_names=var_names,
+            save_name=f'links.csv',
+            digits=5,
+        )
+    except ValueError:
+        print(
+            f'No causality found, writing empty csv')
+        with open(f'links.csv', 'w') as f:
+            f.write(
+                'Variable i,Variable j,Time lag of i,Link type i --- j,Link value')
 
-        try:
-            tp.write_csv(
-                val_matrix=results['val_matrix'],
-                graph=results['graph'],
-                var_names=var_names,
-                save_name=f'matches/{match_folder}/links/link_{player_id}.csv',
-                digits=5,
-            )
-        except ValueError:
-            print(
-                f'No causality found for player {player_id}, writing empty csv')
-            with open(f'matches/{match_folder}/links/link_{player_id}.csv', 'w') as f:
-                f.write(
-                    'Variable i,Variable j,Time lag of i,Link type i --- j,Link value')
-
-    if save_results:
-        with open(f'matches/{match_folder}/results.pkl', 'wb') as f:
-            pickle.dump(all_player_results, f)
+    if save_result:
+        with open(f'result.pkl', 'wb') as f:
+            pickle.dump(result, f)
     print('PCMCI saved')
-    return all_player_results
+    return result
 
 
 def aggregateLinks(match_folder=None):
-    print('Aggregating results')
+    print('Aggregating result')
     if match_folder is not None:
         links_folder = f'matches/{match_folder}/links'
         link_files = [os.path.join(links_folder, file)
@@ -164,13 +162,8 @@ def aggregateLinks(match_folder=None):
 
 if __name__ == '__main__':
     max_match_folder = 10
-    for m in range(max_match_folder):
-        print(f'PCMCI on match_{m}')
-        match_folder = f'match_{m}'
-        runPCMCI(match_folder)
-    graph, val_matrix = aggregateLinks()
-    pickle.dump(graph, open('graph.pkl', 'wb'))
-    pickle.dump(val_matrix, open('val_matrix.pkl', 'wb'))
+    folder_list = [f'match_{i}' for i in range(max_match_folder)]
+    runPCMCI(folder_list, save_graphs=True, save_time_series_graphs=True, save_result=True)
 
 # Prediction
 # temp_df = df.drop(columns=['player_id', 'time'])

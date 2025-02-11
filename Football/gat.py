@@ -40,13 +40,13 @@ for name in match_folders:
         print(f"Data up to {name}")
         break
     
-assert len(match_data) > 0, "No data found"
+assert len(match_data) > 1, "Not enough data"
 test_data, train_data = train_test_split(match_data, test_size=0.2)
 
-test_formatter = PandasFormatterEnsemble(test_data)
-variables = test_formatter.get_formatted_columns()
+# test_formatter = PandasFormatterEnsemble(test_data)
+# variables = test_formatter.get_formatted_columns()
 
-train_formatter = PandasFormatterEnsemble(train_data)
+# train_formatter = PandasFormatterEnsemble(train_data)
 train_sequences, *_ = train_formatter.format(event_driven=True)
 train_sequences = {i: sequence for i, sequence in enumerate(train_sequences)}
 

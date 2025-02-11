@@ -132,54 +132,83 @@ def mlpData(match_folder):
 
 
 def gatData(match_folder):
-    if not os.path.exists(f'matches/{match_folder}/match_data_causal.csv'):
-        causalData(match_folder)
-    df = pd.read_csv(f'matches/{match_folder}/match_data_causal.csv')
-    columns = [f'action_(t-{TAU_MAX-i})' for i in range(TAU_MAX)]
-    columns.extend(['result'])
-    results = []
-    # read TAU_MAX+1 rows at a time
-    for index in range(TAU_MAX, len(df)):
-        temp_df = df.iloc[index-TAU_MAX:index+1]
-        actions = []
-        skip = False
-        for i in range(len(temp_df)):
-            action = list(np.where(temp_df.iloc[i, 2:] == 1)[0])
-            if len(action) == 0 and i == 0:
-                skip = True
-                break
-            # Interpolate missing actions
-            actions.append(action if len(action) > 0 else actions[i-1])
-        if not skip:
-            results = expand_2d_list(results, actions)
-    gat_df = pd.DataFrame(results, columns=columns)
-    gat_df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
+    df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
+    df = df.drop(columns=['id', 'event',
+                          'action_result', 'x_begin', 'y_begin', 'x_end', 'y_end'])
+
+    # action_df = pd.read_csv('fkeys/action.csv')
+    columns = ['player_id', 'time', 'action']
+    # columns.extend(action_df['action'].values)
+    new_df = pd.DataFrame(columns=columns)
+    min_time = df['time'].min()
+    max_time = df['time'].max()
+
+    player_ids = df['player_id'].unique()
+    for player_id in player_ids:
+        temp_df = pd.DataFrame(columns=columns)
+        temp_df['player_id'] = [player_id]*((max_time-min_time)+1)
+        temp_df['time'] = np.arange(min_time, max_time+1)
+        # fill in respective actions at respective times
+        player_df = searchDF(df, [('player_id', player_id)])
+        for index, row in player_df.iterrows():
+            action = row['action']
+            time = row['time']
+            temp_df.loc[temp_df['time'] == time, 'action'] = action
+        # If a time has no action, fill in with the previous action
+        temp_df['action'] = temp_df['action'].fillna(method='ffill')
+        new_df = pd.concat([new_df, temp_df], ignore_index=True)
+    new_df = new_df.fillna(-1).drop(columns=['player_id']).astype(int)
+    new_df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
+    return new_df
+
+    # if not os.path.exists(f'matches/{match_folder}/match_data_causal.csv'):
+    #     causalData(match_folder)
+    # df = pd.read_csv(f'matches/{match_folder}/match_data_causal.csv')
+    # columns = [f'action_(t-{TAU_MAX-i})' for i in range(TAU_MAX)]
+    # columns.extend(['result'])
+    # results = []
+    # # read TAU_MAX+1 rows at a time
+    # for index in range(TAU_MAX, len(df)):
+    #     temp_df = df.iloc[index-TAU_MAX:index+1]
+    #     actions = []
+    #     skip = False
+    #     for i in range(len(temp_df)):
+    #         action = list(np.where(temp_df.iloc[i, 2:] == 1)[0])
+    #         if len(action) == 0 and i == 0:
+    #             skip = True
+    #             break
+    #         # Interpolate missing actions
+    #         actions.append(action if len(action) > 0 else actions[i-1])
+    #     if not skip:
+    #         results = expand_2d_list(results, actions)
+    # gat_df = pd.DataFrame(results, columns=columns)
+    # gat_df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
 
 
-def expand_2d_list(results, lst):
-    # Base case: if every element in lst is length 1, return lst as 1 list
-    if all([len(elem) == 1 for elem in lst]):
-        results.append([elem[0] for elem in lst])
-    # Recursive case:
-    else:
-        # Find the first element in lst that is not length 1
-        for i, elem in enumerate(lst):
-            if len(elem) != 1:
-                # For each element in elem, create a new list with that element
-                for item in elem:
-                    new_lst = lst.copy()
-                    new_lst[i] = [item]
-                    expand_2d_list(results, new_lst)
-                break
-    return results
+# def expand_2d_list(results, lst):
+#     # Base case: if every element in lst is length 1, return lst as 1 list
+#     if all([len(elem) == 1 for elem in lst]):
+#         results.append([elem[0] for elem in lst])
+#     # Recursive case:
+#     else:
+#         # Find the first element in lst that is not length 1
+#         for i, elem in enumerate(lst):
+#             if len(elem) != 1:
+#                 # For each element in elem, create a new list with that element
+#                 for item in elem:
+#                     new_lst = lst.copy()
+#                     new_lst[i] = [item]
+#                     expand_2d_list(results, new_lst)
+#                 break
+#     return results
 
 
 if __name__ == '__main__':
     # matchData()
-    max_match_folder = 10
+    max_match_folder = 1
     for m in range(max_match_folder):
         print(f'Processing match_{m}')
         match_folder = f'match_{m}'
-        causalData(match_folder)
+        # causalData(match_folder)
         # mlpData(match_folder)
         gatData(match_folder)

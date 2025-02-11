@@ -271,19 +271,19 @@ class PandasFormatterEnsemble(PandasFormatter):
 
     @staticmethod
     def merge_dataframes(dfs : List[pd.DataFrame], individual_key : str, time_key : str, close_neighbour_key : str, distant_neighbour_key : str):
-        time_offset = 0
-        individual_offset = 0
-        for i in range(len(dfs)):
-            max_time = dfs[i][time_key].max()
-            max_id = dfs[i][individual_key].max()
-            dfs[i][time_key] += time_offset
-            dfs[i][individual_key] += individual_offset
+        # time_offset = 0
+        # individual_offset = 0
+        # for i in range(len(dfs)):
+            # max_time = dfs[i][time_key].max()
+            # max_id = dfs[i][individual_key].max()
+            # dfs[i][time_key] += time_offset
+            # dfs[i][individual_key] += individual_offset
 
-            dfs[i][close_neighbour_key] = dfs[i][close_neighbour_key].str.replace(r'(\d+)', lambda x: str(int(x.group(1)) + individual_offset), regex=True)
-            dfs[i][distant_neighbour_key] = dfs[i][distant_neighbour_key].str.replace(r'(\d+)', lambda x: str(int(x.group(1)) + individual_offset), regex=True)
+            # dfs[i][close_neighbour_key] = dfs[i][close_neighbour_key].str.replace(r'(\d+)', lambda x: str(int(x.group(1)) + individual_offset), regex=True)
+            # dfs[i][distant_neighbour_key] = dfs[i][distant_neighbour_key].str.replace(r'(\d+)', lambda x: str(int(x.group(1)) + individual_offset), regex=True)
 
-            time_offset += max_time + 1
-            individual_offset += max_id + 1
+            # time_offset += max_time + 1
+            # individual_offset += max_id + 1
         
         return pd.concat(dfs)
             
