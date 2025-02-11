@@ -13,9 +13,9 @@ from common import *
 import pickle
 
 
-class TemporalGATv2(nn.Module):
+class GATv2(nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels, heads=4, dropout=0.2):
-        super(TemporalGATv2, self).__init__()
+        super(GATv2, self).__init__()
         self.dropout = dropout
 
         # First GATv2 layer with edge_dim parameter
@@ -142,17 +142,17 @@ def train(model, data, device, num_epochs=100, lr=0.001):
         # Print progress
         if epoch % 10 == 0:
             print(
-                f'Epoch {epoch:03d}, Train Loss: {loss.item():.4f}, Val Loss: {val_loss.item():.4f}')
+                f'Epoch {epoch}, Train Loss: {loss.item():.4f}, Val Loss: {val_loss.item():.4f}')
 
-        # Early stopping
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            counter = 0
-        else:
-            counter += 1
-            if counter >= patience:
-                print(f'Early stopping at epoch {epoch}')
-                break
+        # # Early stopping
+        # if val_loss < best_val_loss:
+        #     best_val_loss = val_loss
+        #     counter = 0
+        # else:
+        #     counter += 1
+        #     if counter >= patience:
+        #         print(f'Early stopping at epoch {epoch}')
+        #         break
 
     return model
 
@@ -163,14 +163,14 @@ def create_model(node_features, adjacency_matrix_sparse, weight_matrix_sparse, t
                         weight_matrix_sparse, targets, device)
 
     # Initialize model
-    # model = TemporalGATv2(
+    # model = GATv2(
     #     in_channels=node_features.shape[1],
     #     hidden_channels=32,
     #     out_channels=1,
     #     heads=4,
     #     dropout=0.2
     # ).to(device)
-    model = TemporalGATv2(
+    model = GATv2(
         in_channels=node_features.shape[1],
         hidden_channels=32,
         out_channels=1,
@@ -193,13 +193,16 @@ def create_matrix(pcmci_links, num_var, tau):
         adjacency_matrix (scipy.sparse.csr_matrix): Flattened 2D adjacency matrix.
         weight_matrix (scipy.sparse.csr_matrix): Flattened 2D weight matrix.
     """
+    action_df = pd.read_csv("fkeys/action.csv")
     total_nodes = tau * num_var
     adjacency_matrix = lil_matrix((total_nodes, total_nodes), dtype=np.float32)
     weight_matrix = lil_matrix((total_nodes, total_nodes), dtype=np.float32)
 
     for _, row in pcmci_links.iterrows():
         variable_i = row["Variable i"]
+        variable_i = int(action_df[action_df['action'] == variable_i]['id'])
         variable_j = row["Variable j"]
+        variable_j = int(action_df[action_df['action'] == variable_j]['id'])
         source_time_lag = int(row["Time lag of i"])
         link_value = float(row["Link value"])
 
@@ -219,12 +222,11 @@ def create_matrix(pcmci_links, num_var, tau):
 
     return adjacency_matrix_sparse, weight_matrix_sparse
 
-def create_node_features(actions, num_var, tau):
+def create_node_features(num_var, tau):
     """
     Create node features for the flattened graph.
     
     Args:
-        actions (np.array): Array of actions over time.
         num_var (int): Number of actions (nodes).
         tau (int): Maximum time lag.
     
@@ -270,7 +272,8 @@ def create_targets(actions, num_var, tau):
 if __name__ == '__main__':
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = torch.device('cpu')
-    OVERWRITE = False
+    OVERWRITE_MATRIX = True
+    OVERWRITE_MODEL = True
     print(f'Using device: {device}')
     print("Loading data...")
     # Load and concatenate data
@@ -281,67 +284,18 @@ if __name__ == '__main__':
                 [df, pd.read_csv(f"matches/{folder}/match_data_gat.csv")])
 
     pcmci_links = pd.read_csv("links.csv")
-
-    # Parameters
     time_steps_per_block = int(df["time"].max() + 1)
     num_blocks = int(len(df) // time_steps_per_block)
-    threshold = 0.01
 
-    # Step 1: Reshape the data into blocks
     actions = [df["action"].values[i *
                                    time_steps_per_block:(i + 1) * time_steps_per_block] for i in range(num_blocks)]
     actions = np.array(actions)
-    # print(actions.shape)
-    # print(num_blocks, time_steps_per_block)
-    node_features = []
 
-    for block in range(num_blocks):
-        for t in range(time_steps_per_block):
-            # Get past TAU_MAX actions within the same block
-            features = []
-            for lag in range(TAU_MAX):
-                if t - lag >= 0:  # Only look at past times within the same block
-                    features.append(actions[block, t - lag])
-                else:
-                    features.append(-1)  # Pad with zeros if not enough history
-            # Reverse to get [t-TAU_MAX+1, ..., t]
-            node_features.append(features[::-1])
+    num_var = len(df['action'].unique())
 
-    # Shape: (num_blocks * time_steps_per_block, TAU_MAX)
-    node_features = np.array(node_features)
-
-    # Step 2: Initialize matrices
-    total_nodes = len(node_features)
-    if (not os.path.exists("adjacency_matrix_sparse.pkl") and not os.path.exists("weight_matrix_sparse.pkl")) or OVERWRITE:
+    if (not os.path.exists("adjacency_matrix_sparse.pkl") and not os.path.exists("weight_matrix_sparse.pkl")) or OVERWRITE_MATRIX:
         print("Creating adjacency and weight matrix...")
-        # Initialize sparse matrices directly
-        adjacency_matrix = lil_matrix(
-            (total_nodes, total_nodes), dtype=np.float32)
-        weight_matrix = lil_matrix(
-            (total_nodes, total_nodes), dtype=np.float32)
-
-        # Step 3: Populate sparse matrices using PCMCI links
-        for _, row in pcmci_links.iterrows():
-            variable_i = row["Variable i"]
-            variable_j = row["Variable j"]
-            source_time_lag = int(row["Time lag of i"])
-            link_value = float(row["Link value"])
-
-            # Iterate over blocks and time steps
-            for block in range(num_blocks):
-                block_offset = block * time_steps_per_block
-                # for all pairs of nodes in the same block, if row1 action equal to variable i and row2 action equal to variable j and time of row2-row1 equal to time lag of i, then add link
-                for t1 in range(time_steps_per_block):
-                    for t2 in range(t1+1, time_steps_per_block):
-                        i = block_offset + t1
-                        j = block_offset + t2
-                        if actions[block, t1] == variable_i and actions[block, t2] == variable_j and t2 - t1 == source_time_lag:
-                            adjacency_matrix[i, j] = 1
-                            weight_matrix[i, j] = link_value
-
-        # Step 4: Convert to CSR format for efficient computation
-        adjacency_matrix_sparse = adjacency_matrix.tocsr()
-        weight_matrix_sparse = weight_matrix.tocsr()
+        adjacency_matrix_sparse, weight_matrix_sparse = create_matrix(pcmci_links, num_var, TAU_MAX)
 
         pickle.dump(adjacency_matrix_sparse, open(
             "adjacency_matrix_sparse.pkl", "wb"))
@@ -356,21 +310,20 @@ if __name__ == '__main__':
 
     # Step 5: Prepare targets (future actions within the same block)
     print("Creating targets...")
-    targets = []
-    for block in range(num_blocks):
-        block_actions = actions[block]
-        block_targets = block_actions[1:]  # Shift by 1 to get future actions
-        targets.extend(block_targets)
-        if block < num_blocks - 1:
-            targets.append(-1)
-    targets = np.array(targets)
+    targets = create_targets(actions, num_var, TAU_MAX)
+    node_features = create_node_features(num_var, TAU_MAX)
 
-    print("Creating model...")
-    model, data = create_model(node_features, adjacency_matrix_sparse,
-                               weight_matrix_sparse, targets, device)
-    print("Training model...")
-    model = train(model, data, device)
-    pickle.dump(model, open("model.pkl", "wb"))
+    if (not os.path.exists("model.pkl")) or OVERWRITE_MODEL:
+        print("Creating model...")
+        model, data = create_model(node_features, adjacency_matrix_sparse,
+                                weight_matrix_sparse, targets, device)
+        print("Training model...")
+        model = train(model, data, device)
+        pickle.dump(model, open("model.pkl", "wb"))
+    else:
+        print("Loading model...")
+        model = pickle.load(open("model.pkl", "rb"))
+
     print("Making predictions...")
     # Make predictions
     model.eval()
@@ -384,13 +337,13 @@ if __name__ == '__main__':
         true_np = data.y.numpy()
 
         # Convert continuous values to binary using threshold of 0.5
-        pred_binary = (pred_np >= 0.5).astype(int)
-        true_binary = (true_np >= 0.5).astype(int)
+        pred_np = (pred_np >= 0.5).astype(int)
+        true_np = (true_np >= 0.5).astype(int)
 
         # Calculate metrics
-        accuracy = accuracy_score(true_binary, pred_binary)
-        precision = precision_score(true_binary, pred_binary, zero_division=0)
-        recall = recall_score(true_binary, pred_binary, zero_division=0)
-        f1 = f1_score(true_binary, pred_binary, zero_division=0)
+        accuracy = accuracy_score(true_np, pred_np)
+        precision = precision_score(true_np, pred_np, zero_division=0)
+        recall = recall_score(true_np, pred_np, zero_division=0)
+        f1 = f1_score(true_np, pred_np, zero_division=0)
         print(
             f'Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1-score: {f1}')
