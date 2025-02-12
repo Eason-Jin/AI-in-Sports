@@ -121,19 +121,6 @@ def train(model, data, device, num_epochs=100, lr=0.001):
             loss.backward()
             optimizer.step()
 
-            # Validation
-            # model.eval()
-            # with torch.no_grad():
-            #     val_targets = data.y[val_idx]
-            #     if len(val_targets.shape) == 1:
-            #         val_targets = val_targets.unsqueeze(1)
-
-            # val_loss = criterion(out[val_idx], val_targets)
-
-            # Print progress
-            # if epoch % 10 == 0:
-            #     print(
-            #         f'Epoch {epoch}, Train Loss: {loss.item():.4f}, Val Loss: {val_loss.item():.4f}')
             bar()
 
     return model
@@ -167,16 +154,15 @@ def create_matrix(pcmci_links, num_var, tau):
         for _, row in pcmci_links.iterrows():
             variable_i, variable_j, time_lag, link_type, link_value = read_pcmci_row(
                 row)
-
+            if link_value == 0:
+                bar()
+                continue
             # Map variables to their respective nodes in the flattened graph
             pos_i = time_lag * num_var + variable_i
             pos_j = time_lag * num_var + variable_j
             if link_type == '-->':
                 adjacency_matrix[pos_i, pos_j] = 1
                 weight_matrix[pos_i, pos_j] = link_value
-            elif link_type == '<--':
-                adjacency_matrix[pos_j, pos_i] = 1
-                weight_matrix[pos_j, pos_i] = link_value
             elif link_type == 'o-o':
                 adjacency_matrix[pos_i, pos_j] = 1
                 weight_matrix[pos_i, pos_j] = link_value
@@ -256,7 +242,7 @@ if __name__ == '__main__':
     OVERWRITE_MODEL = False
     print(f'Using device: {device}')
     print("Loading data...")
-    pcmci_links = pd.read_csv("links.csv")
+    pcmci_links = pd.read_csv("aggregated_links.csv")
     action_df = pd.read_csv("fkeys/action.csv")
 
     num_var = action_df['id'].max()+1
@@ -273,6 +259,7 @@ if __name__ == '__main__':
 
     data = create_data(node_features, adjacency_matrix_sparse,
                        weight_matrix_sparse, targets, device)
+
     if (not os.path.exists("model.pkl")) or OVERWRITE_MODEL:
         print("Creating model...")
         model = create_model(node_features, device)
