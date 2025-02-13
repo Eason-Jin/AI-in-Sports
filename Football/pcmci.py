@@ -1,19 +1,14 @@
-from tigramite.models import Prediction
-import sklearn
 import tigramite.plotting as tp
 import pandas as pd
 import numpy as np
-import torch
 import pickle
 from tigramite import data_processing as pp
 from tigramite.pcmci import PCMCI
 from tigramite.independence_tests.parcorr import ParCorr
 from tigramite import plotting as tp
 import os
-import sys
 from common import *
 from process_data import *
-import matplotlib.pyplot as plt
 
 
 def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save_result=False):
@@ -163,7 +158,7 @@ def aggregateLinks(match_folder=None):
 if __name__ == '__main__':
     max_match_folder = 10
     folder_list = [f'match_{i}' for i in range(max_match_folder)]
-    runPCMCI(folder_list, save_graphs=True, save_time_series_graphs=True, save_result=True)
+    runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save_result=False)
 
 # Prediction
 # temp_df = df.drop(columns=['player_id', 'time'])

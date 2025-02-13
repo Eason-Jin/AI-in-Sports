@@ -1,9 +1,7 @@
-from scipy.sparse import lil_matrix, csr_matrix
+from scipy.sparse import lil_matrix
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, mutual_info_score
 from torch_geometric.data import Data
-from torch_geometric.nn import GATv2Conv
-import torch.nn.functional as F
 import torch.nn as nn
 import torch
 import numpy as np
@@ -12,54 +10,9 @@ import os
 from common import *
 import pickle
 from alive_progress import alive_bar
-
-
-class GATv2(nn.Module):
-    def __init__(self, in_channels, hidden_channels, out_channels, heads, dropout):
-        super(GATv2, self).__init__()
-        self.dropout = dropout
-
-        # First GATv2 layer with edge_dim parameter
-        self.conv1 = GATv2Conv(
-            in_channels=in_channels,
-            out_channels=hidden_channels,
-            heads=heads,
-            dropout=dropout,
-            edge_dim=1
-        )
-
-        # Second GATv2 layer with edge_dim parameter
-        self.conv2 = GATv2Conv(
-            in_channels=hidden_channels * heads,
-            out_channels=hidden_channels,
-            heads=heads,
-            dropout=dropout,
-            edge_dim=1
-        )
-
-        # Output layer
-        self.linear = nn.Linear(hidden_channels * heads, out_channels)
-
-    def forward(self, x, edge_index, edge_weight=None):
-        # Reshape edge_weight for GATv2Conv
-        if edge_weight is not None:
-            edge_weight = edge_weight.unsqueeze(-1)
-
-        # First GAT layer
-        # Change edge_weight to edge_attr
-        x = self.conv1(x, edge_index, edge_attr=edge_weight)
-        x = F.elu(x)
-        x = F.dropout(x, p=self.dropout, training=self.training)
-
-        # Second GAT layer
-        # Change edge_weight to edge_attr
-        x = self.conv2(x, edge_index, edge_attr=edge_weight)
-        x = F.elu(x)
-        x = F.dropout(x, p=self.dropout, training=self.training)
-
-        # Output layer
-        x = self.linear(x)
-        return x
+from models.gatv2 import GATv2
+from models.gcn import GCN
+import argparse
 
 
 def process_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, targets, device):
@@ -87,21 +40,13 @@ def process_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, t
 
 def train(model, data, device, num_epochs=100, lr=0.001):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    criterion = nn.MSELoss()
+    criterion = nn.CrossEntropyLoss()
 
     # Split indices for train/validation
     num_nodes = data.x.size(0)
     indices = list(range(num_nodes))  # Convert to list for safer splitting
     train_idx, val_idx = train_test_split(
         indices, test_size=0.2, random_state=42)
-
-    # Convert to tensors but make sure they don't exceed the data size
-    train_idx = torch.LongTensor([i for i in train_idx if i < num_nodes])
-    val_idx = torch.LongTensor([i for i in val_idx if i < num_nodes])
-
-    # Verify indices are within bounds
-    assert max(train_idx) < num_nodes, "Training indices out of bounds"
-    assert max(val_idx) < num_nodes, "Validation indices out of bounds"
 
     with alive_bar(num_epochs) as bar:
         for epoch in range(num_epochs):
@@ -112,9 +57,9 @@ def train(model, data, device, num_epochs=100, lr=0.001):
             out = model(data.x, data.edge_index, data.edge_weight)
 
             # Make sure targets are properly aligned
-            train_targets = data.y[train_idx]
-            if len(train_targets.shape) == 1:
-                train_targets = train_targets.unsqueeze(1)
+            train_targets = data.y[train_idx].long()
+            # if len(train_targets.shape) == 1:
+            #     train_targets = train_targets.unsqueeze(1)
 
             loss = criterion(out[train_idx], train_targets)
 
@@ -132,14 +77,22 @@ def create_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, ta
     return data
 
 
-def create_model(node_features, device):
-    model = GATv2(
-        in_channels=node_features.shape[1],
-        hidden_channels=128,
-        out_channels=1,
-        heads=TAU_MAX,
-        dropout=0.2
-    ).to(device)
+def create_model(node_features, out_channels, device, model_type):
+    if model_type == 'gatv2':
+        model = GATv2(
+            in_channels=node_features.shape[1],
+            hidden_channels=128,
+            out_channels=out_channels,
+            heads=TAU_MAX,
+            dropout=0.2
+        ).to(device)
+    elif model_type == 'gcn':
+        model = GCN(
+            in_channels=node_features.shape[1],
+            hidden_channels=128,
+            out_channels=out_channels,
+            dropout=0.2
+        ).to(device)
 
     return model
 
@@ -178,7 +131,8 @@ def create_matrix(pcmci_links, num_var, tau):
 
 
 def read_pcmci_row(row):
-    action_df = pd.read_csv("fkeys/action.csv")
+    global action_path
+    action_df = pd.read_csv(action_path)
     variable_i = row["Variable i"]
     variable_i = int(
         action_df[action_df['action'] == variable_i]['id'].iloc[0])
@@ -236,42 +190,8 @@ def create_targets(num_var, tau):
     return targets
 
 
-if __name__ == '__main__':
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    device = torch.device('cpu')
-    OVERWRITE_MODEL = False
-    print(f'Using device: {device}')
-    print("Loading data...")
-    pcmci_links = pd.read_csv("aggregated_links.csv")
-    action_df = pd.read_csv("fkeys/action.csv")
-
-    num_var = action_df['id'].max()+1
-
-    print("Creating adjacency and weight matrix...")
-    adjacency_matrix_sparse, weight_matrix_sparse = create_matrix(
-        pcmci_links, num_var, TAU_MAX)
-
-    print("Creating node features...")
-    node_features = create_node_features(pcmci_links, num_var, TAU_MAX)
-
-    print("Creating targets...")
-    targets = create_targets(num_var, TAU_MAX)
-
-    data = create_data(node_features, adjacency_matrix_sparse,
-                       weight_matrix_sparse, targets, device)
-
-    if (not os.path.exists("model.pkl")) or OVERWRITE_MODEL:
-        print("Creating model...")
-        model = create_model(node_features, device)
-        print("Training model...")
-        model = train(model, data, device)
-        pickle.dump(model, open("model.pkl", "wb"))
-    else:
-        print("Loading model...")
-        model = pickle.load(open("model.pkl", "rb"))
-
+def evaluation(model, data):
     print("Making predictions...")
-    # Make predictions
     model.eval()
     with torch.no_grad():
         predictions = model(data.x, data.edge_index, data.edge_weight)
@@ -280,14 +200,92 @@ if __name__ == '__main__':
         pred_np = predictions.cpu().squeeze().numpy()
         true_np = data.y.cpu().numpy()
 
-        # Convert continuous values to binary using threshold of 0.5
-        pred_np = (pred_np >= 0.5).astype(int)
-        true_np = (true_np >= 0.5).astype(int)
+        pred_labels = np.argmax(pred_np, axis=1)
+
+        # Convert true labels to integers
+        true_labels = true_np.astype(int)
+
+        print(true_labels)
+        print(pred_labels)
 
         # Calculate metrics
-        accuracy = accuracy_score(true_np, pred_np)
-        precision = precision_score(true_np, pred_np, zero_division=0)
-        recall = recall_score(true_np, pred_np, zero_division=0)
-        f1 = f1_score(true_np, pred_np, zero_division=0)
+        accuracy = accuracy_score(true_labels, pred_labels)
+        precision = precision_score(
+            true_labels, pred_labels, zero_division=0, average='weighted')
+        recall = recall_score(true_labels, pred_labels,
+                              zero_division=0, average='weighted')
+        f1 = f1_score(true_labels, pred_labels,
+                      zero_division=0, average='weighted')
+        mi = mutual_info_score(true_labels, pred_labels)
         print(
-            f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}')
+            f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}, MI: {mi:.4f}')
+
+
+if __name__ == '__main__':
+    print(f"TAU_MAX: {TAU_MAX}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model-path', type=str,
+                        help='Providing a model will only evaluate its performance.')
+    parser.add_argument('--link-path', type=str, default="links.csv",
+                        help='Path to the links CSV file (default: links.csv)')
+    parser.add_argument('--action-path', type=str, default="fkeys/action.csv",
+                        help='Path to the action CSV file (default: fkeys/action.csv)')
+    parser.add_argument('--model-type', type=str, default="gatv2")
+    parser.add_argument('--tau', type=int, default=TAU_MAX)
+    parser.add_argument('--misc-path', type=str)
+    args = parser.parse_args()
+
+    global action_path
+    action_path = args.action_path
+    global link_path
+    link_path = args.link_path
+    model_type = args.model_type
+
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cpu')
+    print(f'Using device: {device}')
+    print("Loading data...")
+    pcmci_links = pd.read_csv(link_path)
+    action_df = pd.read_csv(action_path)
+    os.makedirs("saves", exist_ok=True)
+
+    num_var = action_df['id'].max()+1
+
+    if args.misc_path:
+        print(f"Loading matrices from {args.matrix_path}...")
+        adjacency_matrix_sparse, weight_matrix_sparse = pickle.load(
+            open(args.misc_path, "rb"))
+        print(f"Loading node features from {args.node_features_path}...")
+        node_features = pickle.load(open(args.node_features_path, "rb"))
+        print(f"Loading targets from {args.targets_path}...")
+        targets = pickle.load(open(args.targets_path, "rb"))
+    else:
+        print("Creating adjacency and weight matrix...")
+        adjacency_matrix_sparse, weight_matrix_sparse = create_matrix(
+            pcmci_links, num_var, TAU_MAX)
+        pickle.dump((adjacency_matrix_sparse, weight_matrix_sparse),
+                    open("saves/matrices.pkl", "wb"))
+
+        print("Creating node features...")
+        node_features = create_node_features(pcmci_links, num_var, TAU_MAX)
+        pickle.dump(node_features, open("saves/node_features.pkl", "wb"))
+
+        print("Creating targets...")
+        targets = create_targets(num_var, TAU_MAX)
+        pickle.dump(targets, open("saves/targets.pkl", "wb"))
+
+    data = create_data(node_features, adjacency_matrix_sparse,
+                       weight_matrix_sparse, targets, device)
+
+    if args.model_path:
+        print(f"Loading model from {args.model_path}...")
+        model = pickle.load(open(args.model_path, "rb"))
+    else:
+        print("Creating model...")
+        model = create_model(node_features, num_var,
+                             device, model_type.lower())
+        print("Training model...")
+        model = train(model, data, device)
+        pickle.dump(model, open("saves/model.pkl", "wb"))
+
+    evaluation(model, data)

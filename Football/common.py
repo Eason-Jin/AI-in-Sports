@@ -1,12 +1,8 @@
-import csv
-from datetime import datetime
 import pandas as pd
-import os
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-TAU_MAX = 10
-# match_folder = 'match_0'
+TAU_MAX = 5
 
 
 def apply_conditions(df, conditions):
