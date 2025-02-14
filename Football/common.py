@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-TAU_MAX = 5
+TAU_MAX = 10
 
 
 def apply_conditions(df, conditions):
@@ -85,3 +85,4 @@ def printMetrics(y_true, y_pred):
     recall = recall_score(y_true, y_pred, average='weighted')
     f1 = f1_score(y_true, y_pred, average='weighted')
     print(f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}')
+    return accuracy, precision, recall, f1

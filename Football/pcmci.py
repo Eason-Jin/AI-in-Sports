@@ -9,6 +9,9 @@ from tigramite import plotting as tp
 import os
 from common import *
 from process_data import *
+import datetime
+import argparse
+import shutil
 
 
 def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save_result=False):
@@ -18,13 +21,6 @@ def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save
         df = pd.concat(
             [df, pd.read_csv(f'matches/{folder}/match_data_causal.csv')])
     print('Data loaded')
-
-    # if not os.path.exists(f'matches/{match_folder}/graphs') and save_graphs:
-    #     os.makedirs(f'matches/{match_folder}/graphs')
-    # if not os.path.exists(f'matches/{match_folder}/links'):
-    #     os.makedirs(f'matches/{match_folder}/links')
-    # if not os.path.exists(f'matches/{match_folder}/time_series_graphs') and save_time_series_graphs:
-    #     os.makedirs(f'matches/{match_folder}/time_series_graphs')
 
     # all_player_results = {}
     df = df.astype(np.float64)
@@ -40,13 +36,14 @@ def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save
     # Run PCMCI
     pcmci = PCMCI(dataframe=dataframe,
                   cond_ind_test=ParCorr(significance='analytic'))
-    result = pcmci.run_pcmci(tau_max=TAU_MAX, pc_alpha=None)
-    q_matrix = pcmci.get_corrected_pvalues(
-        p_matrix=result['p_matrix'], tau_max=TAU_MAX, fdr_method='fdr_bh')
+    result = pcmci.run_pcmci(tau_max=tau_max, alpha_level=0.05, pc_alpha=0.05)
+    # q_matrix = pcmci.get_corrected_pvalues(
+    #     p_matrix=result['p_matrix'], tau_max=tau_max, fdr_method='fdr_bh')
 
-    graph = pcmci.get_graph_from_pmatrix(p_matrix=q_matrix, alpha_level=0.01,
-                                         tau_min=0, tau_max=TAU_MAX)
-    result['graph'] = graph
+    # graph = pcmci.get_graph_from_pmatrix(p_matrix=q_matrix, tau_max=tau_max)
+    # result['graph'] = graph
+
+    print(f'Saving results to {save_path}')
 
     if save_graphs:
         tp.plot_graph(
@@ -56,7 +53,7 @@ def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save
             link_colorbar_label='cross-MCI',
             node_colorbar_label='auto-MCI',
             show_autodependency_lags=False,
-            save_name=f'graph.png'
+            save_name=f'{save_path}/graph.png'
         )
 
     if save_time_series_graphs:
@@ -66,7 +63,7 @@ def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save
             graph=result['graph'],
             var_names=var_names,
             link_colorbar_label='MCI',
-            save_name=f'time_series_graph.png'
+            save_name=f'{save_path}/time_series_graph.png'
         )
 
     try:
@@ -74,23 +71,24 @@ def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save
             val_matrix=result['val_matrix'],
             graph=result['graph'],
             var_names=var_names,
-            save_name=f'links.csv',
+            save_name=f'{save_path}/links.csv',
             digits=5,
         )
     except ValueError:
         print(
             f'No causality found, writing empty csv')
-        with open(f'links.csv', 'w') as f:
+        with open(f'{save_path}/links.csv', 'w') as f:
             f.write(
                 'Variable i,Variable j,Time lag of i,Link type i --- j,Link value')
 
     if save_result:
-        with open(f'result.pkl', 'wb') as f:
+        with open(f'{save_path}/result.pkl', 'wb') as f:
             pickle.dump(result, f)
     print('PCMCI saved')
     return result
 
 
+'''
 def aggregateLinks(match_folder=None):
     print('Aggregating result')
     if match_folder is not None:
@@ -119,8 +117,8 @@ def aggregateLinks(match_folder=None):
 
     print('Reconstructing graph')
 
-    graph = createEmptyMatrix(22, 22, TAU_MAX+1, '')
-    val_matrix = createEmptyMatrix(22, 22, TAU_MAX+1, 0.0)
+    graph = createEmptyMatrix(22, 22, tau_max+1, '')
+    val_matrix = createEmptyMatrix(22, 22, tau_max+1, 0.0)
     actions = (pd.read_csv('fkeys/action.csv')['action']).tolist()
     links = pd.read_csv(f'aggregated_links.csv')
     for index, row in links.iterrows():
@@ -153,60 +151,24 @@ def aggregateLinks(match_folder=None):
     )
     print('Graph saved')
     return graph, val_matrix
+'''
+
+
+def copyAction(action_path):
+    shutil.copy2(action_path, f'{save_path}/action.csv')
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--action-path', type=str, default="fkeys/action.csv")
+    parser.add_argument('--tau', type=int, default=TAU_MAX)
+    args = parser.parse_args()
+    tau_max = args.tau
+    folder_name = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    save_path = f'saves/{folder_name}'
+    os.makedirs(save_path, exist_ok=True)
     max_match_folder = 10
     folder_list = [f'match_{i}' for i in range(max_match_folder)]
-    runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save_result=False)
-
-# Prediction
-# temp_df = df.drop(columns=['player_id', 'time'])
-# var_names = temp_df.columns
-# full_dataframe = pp.DataFrame(
-#     temp_df.astype(np.float64).to_numpy(), datatime=df['time'].to_numpy(), var_names=var_names)
-# T = list(full_dataframe.T.values())[0]
-
-
-# pred = Prediction(dataframe=full_dataframe,
-#                   cond_ind_test=ParCorr(),
-#                   prediction_model=sklearn.linear_model.LinearRegression(),
-#                   data_transform=sklearn.preprocessing.StandardScaler(),
-#                   train_indices=range(int(0.8*T)),
-#                   test_indices=range(int(0.9*T), T),
-#                   verbosity=1
-#                   )
-
-# predictors = pred.get_predictors(
-#     tau_max=TAU_MAX,
-#     pc_alpha=None
-# )
-
-# pred.fit(target_predictors=predictors,
-#          tau_max=TAU_MAX)
-
-# target = [i for i in range(len(var_names))]
-# predicted = pred.predict(target)
-# true_data = []
-# for j in target:
-#     true_data.append(pred.get_test_array(j=j)[0])
-# # print(predicted.shape)
-# # print(np.array(true_data).shape)
-# true_data = np.array(true_data).T
-# plt.scatter(true_data, predicted)
-# plt.title(r"NMAE = %.2f" %
-#           (np.abs(true_data - predicted).mean()/true_data.std()))
-# plt.plot(true_data, true_data, 'k-')
-# plt.xlabel('True test data')
-# plt.ylabel('Predicted test data')
-# plt.show()
-# mae = np.mean(np.abs(true_data - predicted))
-# mse = np.mean((true_data - predicted) ** 2)
-# rmse = np.sqrt(mse)
-# ss_res = np.sum((true_data - predicted) ** 2)
-# ss_tot = np.sum((true_data - np.mean(true_data)) ** 2)
-# r2 = 1 - (ss_res / ss_tot)
-# nmae = mae / np.std(true_data)
-# threshold = 0.05  # 5% threshold
-# accuracy = np.mean(np.abs((true_data - predicted) / true_data) < threshold)
-# print(accuracy)
+    runPCMCI(folder_list, save_graphs=False,
+             save_time_series_graphs=False, save_result=False)
+    copyAction(args.action_path)

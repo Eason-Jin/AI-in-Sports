@@ -38,15 +38,9 @@ def process_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, t
     return data
 
 
-def train(model, data, device, num_epochs=100, lr=0.001):
+def train(model, train_data, device, num_epochs=100, lr=0.001):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = nn.CrossEntropyLoss()
-
-    # Split indices for train/validation
-    num_nodes = data.x.size(0)
-    indices = list(range(num_nodes))  # Convert to list for safer splitting
-    train_idx, val_idx = train_test_split(
-        indices, test_size=0.2, random_state=42)
 
     with alive_bar(num_epochs) as bar:
         for epoch in range(num_epochs):
@@ -54,14 +48,10 @@ def train(model, data, device, num_epochs=100, lr=0.001):
             model.train()
             optimizer.zero_grad()
 
-            out = model(data.x, data.edge_index, data.edge_weight)
+            out = model(train_data.x, train_data.edge_index,
+                        train_data.edge_weight)
 
-            # Make sure targets are properly aligned
-            train_targets = data.y[train_idx].long()
-            # if len(train_targets.shape) == 1:
-            #     train_targets = train_targets.unsqueeze(1)
-
-            loss = criterion(out[train_idx], train_targets)
+            loss = criterion(out, train_data.y.long())
 
             loss.backward()
             optimizer.step()
@@ -83,7 +73,7 @@ def create_model(node_features, out_channels, device, model_type):
             in_channels=node_features.shape[1],
             hidden_channels=128,
             out_channels=out_channels,
-            heads=TAU_MAX,
+            heads=tau_max,
             dropout=0.2
         ).to(device)
     elif model_type == 'gcn':
@@ -98,8 +88,8 @@ def create_model(node_features, out_channels, device, model_type):
 
 
 def create_matrix(pcmci_links, num_var, tau):
-    # Time lag goes from 0 to TAU_MAX inclusive
-    total_nodes = (tau+1) * num_var
+    # Time lag goes from 0 to tau_max inclusive
+    total_nodes = tau * num_var
     adjacency_matrix = lil_matrix((total_nodes, total_nodes), dtype=np.float32)
     weight_matrix = lil_matrix((total_nodes, total_nodes), dtype=np.float32)
 
@@ -107,12 +97,14 @@ def create_matrix(pcmci_links, num_var, tau):
         for _, row in pcmci_links.iterrows():
             variable_i, variable_j, time_lag, link_type, link_value = read_pcmci_row(
                 row)
-            if link_value == 0:
+            if link_value == 0 or time_lag == 0:
                 bar()
                 continue
             # Map variables to their respective nodes in the flattened graph
-            pos_i = time_lag * num_var + variable_i
-            pos_j = time_lag * num_var + variable_j
+            pos_i = (time_lag-1) * num_var + variable_i
+            pos_j = (time_lag-1) * num_var + variable_j
+            random_number = np.random.rand()/1000
+            link_value = random_number
             if link_type == '-->':
                 adjacency_matrix[pos_i, pos_j] = 1
                 weight_matrix[pos_i, pos_j] = link_value
@@ -131,8 +123,6 @@ def create_matrix(pcmci_links, num_var, tau):
 
 
 def read_pcmci_row(row):
-    global action_path
-    action_df = pd.read_csv(action_path)
     variable_i = row["Variable i"]
     variable_i = int(
         action_df[action_df['action'] == variable_i]['id'].iloc[0])
@@ -151,14 +141,14 @@ def create_node_features(pcmci_links, num_var, tau):
     Node features should be a list of tau actions leading up to the node.
     """
     node_features = []
-    with alive_bar(int((tau+1)*num_var)) as bar:
-        # time = 0  (current)                [a1, a2, a3, ..., an], n=TAU_MAX
+    with alive_bar(int(tau*num_var)) as bar:
+        # time = 0  (current)                [a1, a2, a3, ..., an], n=tau_max
         # time = 1  (1 unit back in time)    [-1, a1, a2, a3, ..., an-1]
         # time = 2  (2 units back in time)   [-1, -1, a1, a2, ..., an-2]
         # ...
-        # time = TAU_MAX (TAU_MAX units back in time) [-1, -1, -1, ..., -1]
-        # Order of adjacency matrix is [time=0, time=1, time=2, ..., time=TAU_MAX]
-        for t in range(tau):
+        # time = tau_max (tau_max units back in time) [-1, -1, -1, ..., -1]
+        # Order of adjacency matrix is [time=0, time=1, time=2, ..., time=tau_max]
+        for t in range(tau-1):
             # Ignore the last one because it will be all -1
             for i in range(num_var):
                 # Search in pcmci_links for all actions leads up to node (action i at time t)
@@ -174,118 +164,146 @@ def create_node_features(pcmci_links, num_var, tau):
                             # TODO: Need a better solution, for now just use the first one
                             past_actions[index] = variable_i
                 bar()
+                for i in range(1, len(past_actions)):
+                    if past_actions[i] == -1 and past_actions[i-1] != -1:
+                        past_actions[i] = past_actions[i-1]
                 node_features.append(past_actions)
         for _ in range(num_var):
             node_features.append([-1 for _ in range(tau)])
             bar()
+    # print(node_features)
     return np.array(node_features)
 
 
 def create_targets(num_var, tau):
     """
-    Each node (target) is an action at time lag, time lag goes from 0 to TAU_MAX.
+    Each node (target) is an action at time lag, time lag goes from 0 to tau_max.
     """
-    targets = [i for i in range(num_var)] * (tau+1)
+    targets = [i for i in range(num_var)] * tau
     targets = np.array(targets, dtype=np.float32)
     return targets
 
 
-def evaluation(model, data):
+def evaluation(model, test_data):
     print("Making predictions...")
     model.eval()
     with torch.no_grad():
-        predictions = model(data.x, data.edge_index, data.edge_weight)
+        predictions = model(
+            test_data.x, test_data.edge_index, test_data.edge_weight)
 
         # Move tensors to CPU for metric calculation
         pred_np = predictions.cpu().squeeze().numpy()
-        true_np = data.y.cpu().numpy()
+        true_np = test_data.y.cpu().numpy()
 
         pred_labels = np.argmax(pred_np, axis=1)
 
         # Convert true labels to integers
         true_labels = true_np.astype(int)
 
-        print(true_labels)
-        print(pred_labels)
-
         # Calculate metrics
         accuracy = accuracy_score(true_labels, pred_labels)
         precision = precision_score(
-            true_labels, pred_labels, zero_division=0, average='weighted')
+            true_labels, pred_labels, zero_division=0, average='macro')
         recall = recall_score(true_labels, pred_labels,
-                              zero_division=0, average='weighted')
+                              zero_division=0, average='macro')
         f1 = f1_score(true_labels, pred_labels,
-                      zero_division=0, average='weighted')
+                      zero_division=0, average='macro')
         mi = mutual_info_score(true_labels, pred_labels)
-        print(
-            f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}, MI: {mi:.4f}')
+        metrics = f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}, MI: {mi:.4f}'
+        print(metrics)
+        with open(f'{pcmci_path}/config.txt', 'w') as f:
+            f.write(f'Model Type: {model_type}\n')
+            f.write(f'Tau: {tau_max}\n')
+            f.write(f'PCMCI Path: {pcmci_path}\n')
+            f.write(metrics)
+            f.write('\nNotes: ')
+
+
+def get_last_subfolder(folder_path):
+    subfolders = [f.path for f in os.scandir(folder_path) if f.is_dir()]
+    if not subfolders:
+        return None
+    return max(subfolders, key=os.path.getmtime)
 
 
 if __name__ == '__main__':
-    print(f"TAU_MAX: {TAU_MAX}")
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model-path', type=str,
-                        help='Providing a model will only evaluate its performance.')
-    parser.add_argument('--link-path', type=str, default="links.csv",
-                        help='Path to the links CSV file (default: links.csv)')
-    parser.add_argument('--action-path', type=str, default="fkeys/action.csv",
-                        help='Path to the action CSV file (default: fkeys/action.csv)')
+    parser.add_argument('--pcmci-path', type=str,
+                        default=get_last_subfolder("saves"))
     parser.add_argument('--model-type', type=str, default="gatv2")
     parser.add_argument('--tau', type=int, default=TAU_MAX)
-    parser.add_argument('--misc-path', type=str)
+    parser.add_argument('--load-model', type=str)
     args = parser.parse_args()
-
-    global action_path
-    action_path = args.action_path
-    global link_path
-    link_path = args.link_path
+    pcmci_path = args.pcmci_path
     model_type = args.model_type
+    tau_max = args.tau
 
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = torch.device('cpu')
     print(f'Using device: {device}')
     print("Loading data...")
-    pcmci_links = pd.read_csv(link_path)
-    action_df = pd.read_csv(action_path)
-    os.makedirs("saves", exist_ok=True)
+    pcmci_links = pd.read_csv(f'{pcmci_path}/links.csv')
+    action_df = pd.read_csv(f'{pcmci_path}/action.csv')
 
     num_var = action_df['id'].max()+1
 
-    if args.misc_path:
-        print(f"Loading matrices from {args.matrix_path}...")
+    load_path = args.load_model
+    if load_path:
+        print(f"Loading matrices from {load_path}...")
         adjacency_matrix_sparse, weight_matrix_sparse = pickle.load(
-            open(args.misc_path, "rb"))
-        print(f"Loading node features from {args.node_features_path}...")
-        node_features = pickle.load(open(args.node_features_path, "rb"))
-        print(f"Loading targets from {args.targets_path}...")
-        targets = pickle.load(open(args.targets_path, "rb"))
+            open(f'{load_path}/matrices.pkl', "rb"))
+        print(f"Loading node features from {load_path}...")
+        node_features = pickle.load(
+            open(f'{load_path}/node_features.pkl', "rb"))
+        print(f"Loading targets from {load_path}...")
+        targets = pickle.load(open(f'{load_path}/targets.pkl', "rb"))
     else:
         print("Creating adjacency and weight matrix...")
         adjacency_matrix_sparse, weight_matrix_sparse = create_matrix(
-            pcmci_links, num_var, TAU_MAX)
+            pcmci_links, num_var, tau_max)
         pickle.dump((adjacency_matrix_sparse, weight_matrix_sparse),
-                    open("saves/matrices.pkl", "wb"))
+                    open(f"{pcmci_path}/matrices.pkl", "wb"))
 
         print("Creating node features...")
-        node_features = create_node_features(pcmci_links, num_var, TAU_MAX)
-        pickle.dump(node_features, open("saves/node_features.pkl", "wb"))
+        node_features = create_node_features(pcmci_links, num_var, tau_max)
+        pickle.dump(node_features, open(
+            f"{pcmci_path}/node_features.pkl", "wb"))
 
         print("Creating targets...")
-        targets = create_targets(num_var, TAU_MAX)
-        pickle.dump(targets, open("saves/targets.pkl", "wb"))
+        targets = create_targets(num_var, tau_max)
+        pickle.dump(targets, open(f"{pcmci_path}/targets.pkl", "wb"))
 
     data = create_data(node_features, adjacency_matrix_sparse,
                        weight_matrix_sparse, targets, device)
 
-    if args.model_path:
-        print(f"Loading model from {args.model_path}...")
-        model = pickle.load(open(args.model_path, "rb"))
+    num_nodes = data.x.shape[0]
+    train_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    test_mask = torch.zeros(num_nodes, dtype=torch.bool)
+
+    train_indices, test_indices = train_test_split(
+        np.arange(num_nodes), test_size=0.2)
+    train_mask[train_indices] = True
+    test_mask[test_indices] = True
+
+    train_data = Data(
+        x=data.x, edge_index=data.edge_index, edge_weight=data.edge_weight,
+        y=data.y, train_mask=train_mask, test_mask=None  # Test mask is None for training
+    )
+
+    test_data = Data(
+        x=data.x, edge_index=data.edge_index, edge_weight=data.edge_weight,
+        y=data.y, train_mask=None, test_mask=test_mask  # Train mask is None for testing
+    )
+
+    if load_path:
+        print(f"Loading model from {load_path}...")
+        model = pickle.load(open(f'{load_path}/model.pkl', "rb"))
     else:
         print("Creating model...")
         model = create_model(node_features, num_var,
                              device, model_type.lower())
         print("Training model...")
-        model = train(model, data, device)
-        pickle.dump(model, open("saves/model.pkl", "wb"))
+        model = train(model, train_data, device)
+        pickle.dump((model), open(f"{pcmci_path}/model.pkl", "wb"))
 
-    evaluation(model, data)
+    evaluation(model, test_data)

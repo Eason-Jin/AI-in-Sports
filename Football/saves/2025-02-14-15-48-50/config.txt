@@ -1,0 +1,5 @@
+Model Type: gatv2
+Tau: 5
+PCMCI Path: saves\2025-02-14-15-48-50
+Accuracy: 0.7120, Precision: 0.8978, Recall: 0.7120, F1-score: 0.7740, MI: 3.1816
+Notes: 
