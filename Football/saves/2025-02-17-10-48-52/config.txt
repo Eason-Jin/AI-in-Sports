@@ -1,0 +1,5 @@
+Model Type: gcn
+Tau: 10
+PCMCI Path: saves\2025-02-17-10-48-52
+Accuracy: 0.6955, Precision: 0.8102, Recall: 0.6955, F1-score: 0.7113, MI: 2.1278
+Notes: Baseline with GCN

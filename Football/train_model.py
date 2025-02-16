@@ -164,9 +164,11 @@ def create_node_features(pcmci_links, num_var, tau):
                             # TODO: Need a better solution, for now just use the first one
                             past_actions[index] = variable_i
                 bar()
-                for i in range(1, len(past_actions)):
-                    if past_actions[i] == -1 and past_actions[i-1] != -1:
-                        past_actions[i] = past_actions[i-1]
+                if args.fill:
+                    # Fill in the blanks with the previous action
+                    for i in range(1, len(past_actions)):
+                        if past_actions[i] == -1 and past_actions[i-1] != -1:
+                            past_actions[i] = past_actions[i-1]
                 node_features.append(past_actions)
         for _ in range(num_var):
             node_features.append([-1 for _ in range(tau)])
@@ -211,12 +213,15 @@ def evaluation(model, test_data):
         mi = mutual_info_score(true_labels, pred_labels)
         metrics = f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}, MI: {mi:.4f}'
         print(metrics)
-        with open(f'{pcmci_path}/config.txt', 'w') as f:
-            f.write(f'Model Type: {model_type}\n')
-            f.write(f'Tau: {tau_max}\n')
-            f.write(f'PCMCI Path: {pcmci_path}\n')
-            f.write(metrics)
-            f.write('\nNotes: ')
+        if args.load_model is None:
+            with open(f'{pcmci_path}/config.txt', 'w') as f:
+                f.write(f'Model Type: {model_type}\n')
+                f.write(f'Tau: {tau_max}\n')
+                f.write(f'PCMCI Path: {pcmci_path}\n')
+                f.write(metrics)
+                f.write('\nNotes: ')
+                if args.notes:
+                    f.write(args.notes)
 
 
 def get_last_subfolder(folder_path):
@@ -230,18 +235,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pcmci-path', type=str,
                         default=get_last_subfolder("saves"))
-    parser.add_argument('--model-type', type=str, default="gatv2")
+    parser.add_argument('--model-type', type=str, default="gatv2", help="Model type: gatv2 or gcn")
     parser.add_argument('--tau', type=int, default=TAU_MAX)
-    parser.add_argument('--load-model', type=str)
+    parser.add_argument('--load-model', type=str, help="Path to load existing model for evaluation")
+    parser.add_argument('--notes', type=str, help="Notes for the model (will be written to config.txt)")
+    parser.add_argument('--fill', type=bool, default=False, help="Fill in missing actions with previous actions")
     args = parser.parse_args()
     pcmci_path = args.pcmci_path
     model_type = args.model_type
     tau_max = args.tau
+    print(args.fill)
 
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = torch.device('cpu')
     print(f'Using device: {device}')
-    print("Loading data...")
+    print(f"Loading PCMCI and action data from {pcmci_path}...")
     pcmci_links = pd.read_csv(f'{pcmci_path}/links.csv')
     action_df = pd.read_csv(f'{pcmci_path}/action.csv')
 
@@ -287,12 +295,12 @@ if __name__ == '__main__':
 
     train_data = Data(
         x=data.x, edge_index=data.edge_index, edge_weight=data.edge_weight,
-        y=data.y, train_mask=train_mask, test_mask=None  # Test mask is None for training
+        y=data.y, train_mask=train_mask, test_mask=None
     )
 
     test_data = Data(
         x=data.x, edge_index=data.edge_index, edge_weight=data.edge_weight,
-        y=data.y, train_mask=None, test_mask=test_mask  # Train mask is None for testing
+        y=data.y, train_mask=None, test_mask=test_mask
     )
 
     if load_path:

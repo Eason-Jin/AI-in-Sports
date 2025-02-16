@@ -154,8 +154,8 @@ def aggregateLinks(match_folder=None):
 '''
 
 
-def copyAction(action_path):
-    shutil.copy2(action_path, f'{save_path}/action.csv')
+def copyFile(file_path, fname):
+    shutil.copy2(file_path, f'{save_path}/{fname}')
 
 
 if __name__ == '__main__':
@@ -171,4 +171,4 @@ if __name__ == '__main__':
     folder_list = [f'match_{i}' for i in range(max_match_folder)]
     runPCMCI(folder_list, save_graphs=False,
              save_time_series_graphs=False, save_result=False)
-    copyAction(args.action_path)
+    copyFile(args.action_path, 'action.csv')
