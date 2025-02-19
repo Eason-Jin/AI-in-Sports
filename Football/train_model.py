@@ -6,7 +6,6 @@ import torch.nn as nn
 import torch
 import numpy as np
 import pandas as pd
-import os
 from common import *
 import pickle
 from alive_progress import alive_bar
@@ -15,7 +14,7 @@ from models.gcn import GCN
 import argparse
 
 
-def process_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, targets, device):
+def create_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, targets, device):
     # Convert to PyTorch tensors and move to GPU
     x = torch.FloatTensor(node_features).to(device)
     # Get edge indices from sparse adjacency matrix
@@ -38,7 +37,31 @@ def process_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, t
     return data
 
 
-def train(model, train_data, device, num_epochs=100, lr=0.001):
+def create_model(node_features, out_channels, device, model_type):
+    print(f"Creating model of type {model_type}...")
+    if model_type == ModelTypes.GATv2:
+        model = GATv2(
+            in_channels=node_features.shape[1],
+            hidden_channels=128,
+            out_channels=out_channels,
+            heads=tau_max,
+            dropout=0.2
+        ).to(device)
+    elif model_type == ModelTypes.GCN:
+        model = GCN(
+            in_channels=node_features.shape[1],
+            hidden_channels=128,
+            out_channels=out_channels,
+            dropout=0.2
+        ).to(device)
+    else:
+        raise Exception("Model type not supported!")
+
+    return model
+
+
+def train_model(model, train_data, device, num_epochs=100, lr=0.001):
+    print("Training model...")
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = nn.CrossEntropyLoss()
 
@@ -61,33 +84,8 @@ def train(model, train_data, device, num_epochs=100, lr=0.001):
     return model
 
 
-def create_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, targets, device):
-    data = process_data(node_features, adjacency_matrix_sparse,
-                        weight_matrix_sparse, targets, device)
-    return data
-
-
-def create_model(node_features, out_channels, device, model_type):
-    if model_type == 'gatv2':
-        model = GATv2(
-            in_channels=node_features.shape[1],
-            hidden_channels=128,
-            out_channels=out_channels,
-            heads=tau_max,
-            dropout=0.2
-        ).to(device)
-    elif model_type == 'gcn':
-        model = GCN(
-            in_channels=node_features.shape[1],
-            hidden_channels=128,
-            out_channels=out_channels,
-            dropout=0.2
-        ).to(device)
-
-    return model
-
-
-def create_matrix(pcmci_links, num_var, tau):
+def create_matrices(pcmci_links, num_var, tau, link_type):
+    print("Creating adjacency and weight matrix...")
     # Time lag goes from 0 to tau_max inclusive
     total_nodes = tau * num_var
     adjacency_matrix = lil_matrix((total_nodes, total_nodes), dtype=np.float32)
@@ -103,16 +101,30 @@ def create_matrix(pcmci_links, num_var, tau):
             # Map variables to their respective nodes in the flattened graph
             pos_i = (time_lag-1) * num_var + variable_i
             pos_j = (time_lag-1) * num_var + variable_j
-            random_number = np.random.rand()/1000
-            link_value = random_number
+            if link_type == LinkTypes.RANDOM:
+                random_number = np.random.rand()/1000
+                l_v = random_number
+            elif link_type == LinkTypes.PCMCI:
+                l_v = link_value
+            elif link_type == LinkTypes.INVERSE_COUNT:
+                df = readMatchData("match_data.csv")
+                counts = df['action'].value_counts().to_dict()
+                total = sum(counts.values())
+                try:
+                    l_v = 1 - counts[variable_i]/total
+                except KeyError:
+                    l_v = 0
+            else:
+                raise Exception("Link weight type not supported!")
+
             if link_type == '-->':
                 adjacency_matrix[pos_i, pos_j] = 1
-                weight_matrix[pos_i, pos_j] = link_value
+                weight_matrix[pos_i, pos_j] = l_v
             elif link_type == 'o-o':
                 adjacency_matrix[pos_i, pos_j] = 1
-                weight_matrix[pos_i, pos_j] = link_value
+                weight_matrix[pos_i, pos_j] = l_v
                 adjacency_matrix[pos_j, pos_i] = 1
-                weight_matrix[pos_j, pos_i] = link_value
+                weight_matrix[pos_j, pos_i] = l_v
             bar()
 
     # Convert to CSR format for efficient computation
@@ -137,6 +149,7 @@ def read_pcmci_row(row):
 
 
 def create_node_features(pcmci_links, num_var, tau):
+    print("Creating node features...")
     """
     Node features should be a list of tau actions leading up to the node.
     """
@@ -164,11 +177,11 @@ def create_node_features(pcmci_links, num_var, tau):
                             # TODO: Need a better solution, for now just use the first one
                             past_actions[index] = variable_i
                 bar()
-                if args.fill:
-                    # Fill in the blanks with the previous action
-                    for i in range(1, len(past_actions)):
-                        if past_actions[i] == -1 and past_actions[i-1] != -1:
-                            past_actions[i] = past_actions[i-1]
+                # if args.fill:
+                #     # Fill in the blanks with the previous action
+                #     for i in range(1, len(past_actions)):
+                #         if past_actions[i] == -1 and past_actions[i-1] != -1:
+                #             past_actions[i] = past_actions[i-1]
                 node_features.append(past_actions)
         for _ in range(num_var):
             node_features.append([-1 for _ in range(tau)])
@@ -178,6 +191,7 @@ def create_node_features(pcmci_links, num_var, tau):
 
 
 def create_targets(num_var, tau):
+    print("Creating targets...")
     """
     Each node (target) is an action at time lag, time lag goes from 0 to tau_max.
     """
@@ -186,7 +200,7 @@ def create_targets(num_var, tau):
     return targets
 
 
-def evaluation(model, test_data):
+def evaluate_model(model, test_data):
     print("Making predictions...")
     model.eval()
     with torch.no_grad():
@@ -213,7 +227,7 @@ def evaluation(model, test_data):
         mi = mutual_info_score(true_labels, pred_labels)
         metrics = f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}, MI: {mi:.4f}'
         print(metrics)
-        if args.load_model is None:
+        if load_path is None:
             with open(f'{pcmci_path}/config.txt', 'w') as f:
                 f.write(f'Model Type: {model_type}\n')
                 f.write(f'Tau: {tau_max}\n')
@@ -224,27 +238,25 @@ def evaluation(model, test_data):
                     f.write(args.notes)
 
 
-def get_last_subfolder(folder_path):
-    subfolders = [f.path for f in os.scandir(folder_path) if f.is_dir()]
-    if not subfolders:
-        return None
-    return max(subfolders, key=os.path.getmtime)
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pcmci-path', type=str,
                         default=get_last_subfolder("saves"))
-    parser.add_argument('--model-type', type=str, default="gatv2", help="Model type: gatv2 or gcn")
+    parser.add_argument('--model-type', type=str,
+                        default="gatv2", help=f"Possible model types: {[e.value for e in ModelTypes]}")
     parser.add_argument('--tau', type=int, default=TAU_MAX)
-    parser.add_argument('--load-model', type=str, help="Path to load existing model for evaluation")
-    parser.add_argument('--notes', type=str, help="Notes for the model (will be written to config.txt)")
-    parser.add_argument('--fill', type=bool, default=False, help="Fill in missing actions with previous actions")
+    parser.add_argument('--load-model', type=str,
+                        help="Path to load existing model for evaluation")
+    parser.add_argument(
+        '--notes', type=str, help="Notes for the model (will be written to config.txt)")
+    parser.add_argument('--link-type', type=str, default='random',
+                        help=f'Possible link types: {[e.value for e in LinkTypes]}')
     args = parser.parse_args()
     pcmci_path = args.pcmci_path
     model_type = args.model_type
     tau_max = args.tau
-    print(args.fill)
+    load_path = get_enum_key(ModelTypes, args.load_model)
+    link_type = get_enum_key(LinkTypes, args.link_type)
 
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = torch.device('cpu')
@@ -255,29 +267,25 @@ if __name__ == '__main__':
 
     num_var = action_df['id'].max()+1
 
-    load_path = args.load_model
     if load_path:
-        print(f"Loading matrices from {load_path}...")
+        print(f"Loading matrices...")
         adjacency_matrix_sparse, weight_matrix_sparse = pickle.load(
             open(f'{load_path}/matrices.pkl', "rb"))
-        print(f"Loading node features from {load_path}...")
+        print(f"Loading node features...")
         node_features = pickle.load(
             open(f'{load_path}/node_features.pkl', "rb"))
-        print(f"Loading targets from {load_path}...")
+        print(f"Loading targets...")
         targets = pickle.load(open(f'{load_path}/targets.pkl', "rb"))
     else:
-        print("Creating adjacency and weight matrix...")
-        adjacency_matrix_sparse, weight_matrix_sparse = create_matrix(
-            pcmci_links, num_var, tau_max)
+        adjacency_matrix_sparse, weight_matrix_sparse = create_matrices(
+            pcmci_links, num_var, tau_max, link_type)
         pickle.dump((adjacency_matrix_sparse, weight_matrix_sparse),
                     open(f"{pcmci_path}/matrices.pkl", "wb"))
 
-        print("Creating node features...")
         node_features = create_node_features(pcmci_links, num_var, tau_max)
         pickle.dump(node_features, open(
             f"{pcmci_path}/node_features.pkl", "wb"))
 
-        print("Creating targets...")
         targets = create_targets(num_var, tau_max)
         pickle.dump(targets, open(f"{pcmci_path}/targets.pkl", "wb"))
 
@@ -307,11 +315,9 @@ if __name__ == '__main__':
         print(f"Loading model from {load_path}...")
         model = pickle.load(open(f'{load_path}/model.pkl', "rb"))
     else:
-        print("Creating model...")
         model = create_model(node_features, num_var,
                              device, model_type.lower())
-        print("Training model...")
-        model = train(model, train_data, device)
+        model = train_model(model, train_data, device)
         pickle.dump((model), open(f"{pcmci_path}/model.pkl", "wb"))
 
-    evaluation(model, test_data)
+    evaluate_model(model, test_data)

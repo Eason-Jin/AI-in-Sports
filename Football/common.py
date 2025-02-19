@@ -1,6 +1,8 @@
+from enum import Enum
 import pandas as pd
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import os
 
 TAU_MAX = 10
 
@@ -79,10 +81,45 @@ def aggregate_links(group):
 def createEmptyMatrix(width, height, depth, initValue):
     return np.full((width, height, depth), initValue)
 
+
 def printMetrics(y_true, y_pred):
     accuracy = accuracy_score(y_true, y_pred)
     precision = precision_score(y_true, y_pred, average='weighted')
     recall = recall_score(y_true, y_pred, average='weighted')
     f1 = f1_score(y_true, y_pred, average='weighted')
-    print(f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}')
+    print(
+        f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1-score: {f1:.4f}')
     return accuracy, precision, recall, f1
+
+
+def readMatchData(file_name, max_match_folder=10):
+    df = pd.DataFrame()
+    for folder in range(max_match_folder):
+        df = pd.concat(
+            [df, pd.read_csv(f'matches/match_{folder}/{file_name}')])
+    return df
+
+
+class ModelTypes(Enum):
+    GATv2 = 'gat'
+    GCN = 'gcn'
+
+
+class LinkTypes(Enum):
+    RANDOM = 'random'
+    PCMCI = 'pcmci'
+    INVERSE_COUNT = 'inverse_count'
+
+
+def get_enum_key(enum, value):
+    for key, member in enum.__members__.items():
+        if member.value == value:
+            return key
+    return None
+
+
+def get_last_subfolder(folder_path):
+    subfolders = [f.path for f in os.scandir(folder_path) if f.is_dir()]
+    if not subfolders:
+        raise Exception('No PCMCI saves! Run `pcmci.py` first!')
+    return max(subfolders, key=os.path.getmtime)

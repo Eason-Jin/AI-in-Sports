@@ -13,10 +13,10 @@ def runMLP(layers, epochs, batch_size, weight_adjustment=True):
         'matches') if os.path.isdir(os.path.join('matches', f))]
     df_list = []
     for match_folder in match_folders:
-        if os.path.exists(f'matches/{match_folder}/match_data_gat.csv'):
+        if os.path.exists(f'matches/{match_folder}/match_data_mlp.csv'):
             print(f'Processing {match_folder}')
             df_list.append(pd.read_csv(
-                f'matches/{match_folder}/match_data_gat.csv'))
+                f'matches/{match_folder}/match_data_mlp.csv'))
     df = pd.concat(df_list, ignore_index=True)
 
     action_df = pd.read_csv('fkeys/action.csv')
@@ -37,34 +37,35 @@ def runMLP(layers, epochs, batch_size, weight_adjustment=True):
         model.add(tf.keras.layers.Dense(units, activation=activation))
     model.add(tf.keras.layers.Dense(len(action_map)))
 
-    if weight_adjustment:
-        model.build(input_shape=(None, X.shape[1]))
+    model.build(input_shape=(None, X.shape[1]))
 
-        # Initialise weights for the first layer (prev_action → action mapping)
-        # Get default weights
-        first_layer_weights = model.layers[0].get_weights()
-        weight_matrix, bias = first_layer_weights
+    # Initialise weights for the first layer (prev_action → action mapping)
+    # Get default weights
+    first_layer_weights = model.layers[0].get_weights()
+    weight_matrix, bias = first_layer_weights
 
-        # Load PCMCI link file
-        link_file = pd.read_csv(f"aggregated_links.csv")
+    weights_dict = {}
+    link_file = pd.read_csv(f"links.csv")
 
-        weights_dict = {}
-        for _, row in link_file.iterrows():
-            i, j, lag, link_value = row["Variable i"], row["Variable j"], row["Time lag of i"], row["Link value"]
+    for _, row in link_file.iterrows():
+        i, j, lag, link_value = row["Variable i"], row["Variable j"], row["Time lag of i"], row["Link value"]
+        if weight_adjustment:
             weights_dict[(i, j, lag)] = link_value
+        else:
+            weights_dict[(i, j, lag)] = np.random.rand()/1000
 
-        # Apply custom weights based on the links file
-        for (i, j, lag), value in weights_dict.items():
-            mask = (df["prev_action"] == i) & (
-                df["action"] == j) & (df["time_lag"] == lag)
-            indices = np.where(mask)[0]
+    # Apply custom weights
+    for (i, j, lag), value in weights_dict.items():
+        mask = (df["prev_action"] == i) & (
+            df["action"] == j) & (df["time_lag"] == lag)
+        indices = np.where(mask)[0]
 
-            if indices.size > 0:
-                # Set weight for matching entries
-                weight_matrix[indices, j] = value
+        if indices.size > 0:
+            # Set weight for matching entries
+            weight_matrix[indices, j] = value
 
-        # Set updated weights
-        model.layers[0].set_weights([weight_matrix, bias])
+    # Set updated weights
+    model.layers[0].set_weights([weight_matrix, bias])
 
     model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(
         from_logits=True), metrics=['accuracy'])
@@ -75,20 +76,11 @@ def runMLP(layers, epochs, batch_size, weight_adjustment=True):
     printMetrics(y_test, p)
     return model
 
-
-# [128, relu], [64, sigmoid]
-# Accuracy: 0.7200, Precision: 0.6779, Recall: 0.7200, F1-score: 0.6648 (with weight adjustment)
-# Accuracy: 0.6900, Precision: 0.6685, Recall: 0.6900, F1-score: 0.6368 (no weight adjustment)
-
-# [256, relu], [128, sigmoid]
-# Accuracy: 0.8250, Precision: 0.7956, Recall: 0.8250, F1-score: 0.7942 (with weight adjustment)
-# No weight adjustment yields similar results
-
 if __name__ == '__main__':
     LAYERS = [
-        [64, 'leaky_relu'],
-        [32, 'softmax']
+        [128, 'relu'],
+        [64, 'sigmoid']
     ]
     EPOCHS = 100
     BATCH_SIZE = 32
-    runMLP(LAYERS, EPOCHS, BATCH_SIZE, weight_adjustment=True)
+    runMLP(LAYERS, EPOCHS, BATCH_SIZE, weight_adjustment=False)

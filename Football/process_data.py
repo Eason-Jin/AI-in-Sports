@@ -205,10 +205,10 @@ def gatData(match_folder):
 
 if __name__ == '__main__':
     # matchData()
-    max_match_folder = 1
+    max_match_folder = 10
     for m in range(max_match_folder):
         print(f'Processing match_{m}')
         match_folder = f'match_{m}'
-        # causalData(match_folder)
-        # mlpData(match_folder)
+        causalData(match_folder)
         gatData(match_folder)
+        # mlpData(match_folder)

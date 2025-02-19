@@ -14,12 +14,8 @@ import argparse
 import shutil
 
 
-def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save_result=False):
-    df = pd.DataFrame()
-    for folder in folder_list:
-        print(f'Processing {folder}')
-        df = pd.concat(
-            [df, pd.read_csv(f'matches/{folder}/match_data_causal.csv')])
+def runPCMCI(save_graphs=False, save_time_series_graphs=False, save_result=False):
+    df = readMatchData("match_data_causal.csv")
     print('Data loaded')
 
     # all_player_results = {}
@@ -37,11 +33,6 @@ def runPCMCI(folder_list, save_graphs=False, save_time_series_graphs=False, save
     pcmci = PCMCI(dataframe=dataframe,
                   cond_ind_test=ParCorr(significance='analytic'))
     result = pcmci.run_pcmci(tau_max=tau_max, alpha_level=0.05, pc_alpha=0.05)
-    # q_matrix = pcmci.get_corrected_pvalues(
-    #     p_matrix=result['p_matrix'], tau_max=tau_max, fdr_method='fdr_bh')
-
-    # graph = pcmci.get_graph_from_pmatrix(p_matrix=q_matrix, tau_max=tau_max)
-    # result['graph'] = graph
 
     print(f'Saving results to {save_path}')
 
@@ -164,11 +155,10 @@ if __name__ == '__main__':
     parser.add_argument('--tau', type=int, default=TAU_MAX)
     args = parser.parse_args()
     tau_max = args.tau
+    action_path = args.action_path
     folder_name = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
     save_path = f'saves/{folder_name}'
     os.makedirs(save_path, exist_ok=True)
-    max_match_folder = 10
-    folder_list = [f'match_{i}' for i in range(max_match_folder)]
-    runPCMCI(folder_list, save_graphs=False,
+    runPCMCI(save_graphs=False,
              save_time_series_graphs=False, save_result=False)
-    copyFile(args.action_path, 'action.csv')
+    copyFile(action_path, 'action.csv')
