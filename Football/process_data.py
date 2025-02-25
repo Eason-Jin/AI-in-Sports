@@ -64,7 +64,7 @@ def matchData():
         max_time = first_half['time'].max()
         match_df.loc[match_df['match_period'] == 2, 'time'] += max_time
         match_df = match_df.drop(
-            columns=['match_id', 'match_period', 'club_id'])
+            columns=['match_id', 'match_period'])
         min_time = match_df['time'].min()
         match_df['time'] -= min_time
         # convert to minutes
@@ -80,7 +80,7 @@ def matchData():
 def causalData(match_folder):
     df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
     df = df.drop(columns=['id', 'event',
-                          'action_result', 'x_begin', 'y_begin', 'x_end', 'y_end'])
+                          'action_result', 'x_begin', 'y_begin', 'x_end', 'y_end', 'club_id'])
 
     action_df = pd.read_csv('fkeys/action.csv')
     columns = ['player_id', 'time']
@@ -110,7 +110,7 @@ def causalData(match_folder):
 def mlpData(match_folder):
     # time, x_begin, y_begin, x_end, y_end, prev_action, time_lag, action(prediction)
     df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
-    df = df.drop(columns=['id', 'event', 'action_result'])
+    df = df.drop(columns=['id', 'event', 'action_result', 'club_id'])
     action_column = df['action']
     df = df.drop(columns=['action'])
     # Find the previous action that this player took and the time of that action
@@ -134,7 +134,7 @@ def mlpData(match_folder):
 def gatData(match_folder):
     df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
     df = df.drop(columns=['id', 'event',
-                          'action_result', 'x_begin', 'y_begin', 'x_end', 'y_end'])
+                          'action_result', 'x_begin', 'y_begin', 'x_end', 'y_end', 'club_id'])
 
     # action_df = pd.read_csv('fkeys/action.csv')
     columns = ['player_id', 'time', 'action']
@@ -202,13 +202,14 @@ def gatData(match_folder):
 #                 break
 #     return results
 
+def causalData
 
 if __name__ == '__main__':
-    # matchData()
-    max_match_folder = 10
-    for m in range(max_match_folder):
-        print(f'Processing match_{m}')
-        match_folder = f'match_{m}'
-        causalData(match_folder)
-        gatData(match_folder)
-        # mlpData(match_folder)
+    matchData()
+    # max_match_folder = 10
+    # for m in range(max_match_folder):
+    #     print(f'Processing match_{m}')
+    #     match_folder = f'match_{m}'
+    #     causalData(match_folder)
+    #     gatData(match_folder)
+        # mlpData
