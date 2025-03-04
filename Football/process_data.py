@@ -202,14 +202,68 @@ def gatData(match_folder):
 #                 break
 #     return results
 
-def causalData
+def distance(row1, row2):
+    return ((row1['x_begin']-row2['x_begin'])**2+(row1['y_begin']-row2['y_begin'])**2)**0.5
+
+
+def causalData2(match_folder):
+    print(f"Processig {match_folder}")
+    df = pd.read_csv(f'matches/{match_folder}/match_data.csv')
+    df = df.drop(columns=['id', 'event',
+                          'action_result', 'x_end', 'y_end'])
+
+    action_df = pd.read_csv('fkeys/action.csv')
+    columns = ['player_id', 'time']
+    columns.extend(
+        action_df['action'].values.tolist() +
+        ["Close Team " + str(item) for item in action_df['action'].values] +
+        ["Distant Team " + str(item) for item in action_df['action'].values] +
+        ["Close Opponent " + str(item) for item in action_df['action'].values] +
+        ["Distant Opponent " + str(item)
+         for item in action_df['action'].values]
+    )
+    new_df = pd.DataFrame(columns=columns)
+    min_time = df['time'].min()
+    max_time = df['time'].max()
+
+    player_ids = df['player_id'].unique()
+    for player_id in player_ids:
+        temp_df = pd.DataFrame(columns=columns)
+        temp_df['player_id'] = [player_id]*((max_time-min_time)+1)
+        temp_df['time'] = np.arange(min_time, max_time+1)
+        temp_df = temp_df.fillna(0)
+        # perform one hot encoding of action at respective times
+        player_df = searchDF(df, [('player_id', player_id)])
+        player_team = player_df['club_id']
+        for index, row in player_df.iterrows():
+            action = row['action']
+            time = row['time']
+            temp_df.loc[temp_df['time'] == time,
+                        action_df['action'][action]] = 1
+            # N-hot encoding for other players
+            other_players = searchDF(
+                df, [('player_id', '!'+str(player_id)), ('time', time)])
+            for i, r in other_players.iterrows():
+                action = r['action']
+                time = r['time']
+                dist = distance(r, row)
+                prefix = 'Close ' if dist < CLOSE_THRESHOLD else 'Distant '
+                team = 'Team ' if r['club_id'] == str(player_team) else 'Opponent '
+                temp_df.loc[temp_df['time'] == time,
+                            prefix + team + action_df['action'][action]] += 1
+        new_df = pd.concat([new_df, temp_df], ignore_index=True)
+    new_df.to_csv(
+        f'matches/{match_folder}/match_data_causal_2.csv', index=False)
+    return new_df
+
 
 if __name__ == '__main__':
-    matchData()
-    # max_match_folder = 10
-    # for m in range(max_match_folder):
+    # matchData()
+    max_match_folder = 10
+    for m in range(max_match_folder):
     #     print(f'Processing match_{m}')
-    #     match_folder = f'match_{m}'
+        match_folder = f'match_{m}'
+        causalData2(match_folder)
     #     causalData(match_folder)
     #     gatData(match_folder)
-        # mlpData
+    # mlpData(match_folder)

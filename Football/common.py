@@ -3,8 +3,11 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import os
+import torch
 
-TAU_MAX = 10
+TAU_MAX = 5
+CLOSE_THRESHOLD = 45
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def apply_conditions(df, conditions):
@@ -13,17 +16,34 @@ def apply_conditions(df, conditions):
             if val.startswith('!'):
                 df = df[df[col] != val[1:]]
             elif val.startswith('>='):
-                df = df[pd.to_datetime(df[col], errors='coerce') >= pd.to_datetime(
-                    val[2:], errors='coerce')]
+                # Try to convert to numeric first, fall back to datetime if needed
+                try:
+                    numeric_val = float(val[2:])
+                    df = df[df[col].astype(float) >= numeric_val]
+                except ValueError:
+                    df = df[pd.to_datetime(df[col], errors='coerce') >= pd.to_datetime(
+                        val[2:], errors='coerce')]
             elif val.startswith('>'):
-                df = df[pd.to_datetime(df[col], errors='coerce') > pd.to_datetime(
-                    val[1:], errors='coerce')]
+                try:
+                    numeric_val = float(val[1:])
+                    df = df[df[col].astype(float) > numeric_val]
+                except ValueError:
+                    df = df[pd.to_datetime(df[col], errors='coerce') > pd.to_datetime(
+                        val[1:], errors='coerce')]
             elif val.startswith('<='):
-                df = df[pd.to_datetime(df[col], errors='coerce') <= pd.to_datetime(
-                    val[2:], errors='coerce')]
+                try:
+                    numeric_val = float(val[2:])
+                    df = df[df[col].astype(float) <= numeric_val]
+                except ValueError:
+                    df = df[pd.to_datetime(df[col], errors='coerce') <= pd.to_datetime(
+                        val[2:], errors='coerce')]
             elif val.startswith('<'):
-                df = df[pd.to_datetime(df[col], errors='coerce') < pd.to_datetime(
-                    val[1:], errors='coerce')]
+                try:
+                    numeric_val = float(val[1:])
+                    df = df[df[col].astype(float) < numeric_val]
+                except ValueError:
+                    df = df[pd.to_datetime(df[col], errors='coerce') < pd.to_datetime(
+                        val[1:], errors='coerce')]
             elif val.startswith('.'):
                 df = df[df[col].astype(str).str.contains(val[1:], na=False)]
             else:
@@ -101,7 +121,8 @@ def readMatchData(file_name, max_match_folder=10):
 
 
 class ModelTypes(Enum):
-    GATv2 = 'gat'
+    GATv2 = 'gatv2'
+    GATv2_2 = 'gatv2_2'
     GCN = 'gcn'
 
 

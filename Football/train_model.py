@@ -33,7 +33,11 @@ def create_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, ta
         edge_weight=edge_weight,
         y=y
     )
-
+    # tau = 5
+    print(x.shape)              # 110, 5 = num_var*tau, tau
+    print(y.shape)              # 110    = num_var*tau
+    print(edge_index.shape)     # 2, 250
+    print(edge_weight.shape)    # 250    = num_edges (ignored tau 0)
     return data
 
 
@@ -101,21 +105,23 @@ def create_matrices(pcmci_links, num_var, tau, link_type):
             # Map variables to their respective nodes in the flattened graph
             pos_i = (time_lag-1) * num_var + variable_i
             pos_j = (time_lag-1) * num_var + variable_j
-            if link_type == LinkTypes.RANDOM:
-                random_number = np.random.rand()/1000
-                l_v = random_number
-            elif link_type == LinkTypes.PCMCI:
-                l_v = link_value
-            elif link_type == LinkTypes.INVERSE_COUNT:
-                df = readMatchData("match_data.csv")
-                counts = df['action'].value_counts().to_dict()
-                total = sum(counts.values())
-                try:
-                    l_v = 1 - counts[variable_i]/total
-                except KeyError:
-                    l_v = 0
-            else:
-                raise Exception("Link weight type not supported!")
+            random_number = np.random.rand()/1000
+            l_v = random_number
+            # if link_type == LinkTypes.RANDOM:
+            #     random_number = np.random.rand()/1000
+            #     l_v = random_number
+            # elif link_type == LinkTypes.PCMCI:
+            #     l_v = link_value
+            # elif link_type == LinkTypes.INVERSE_COUNT:
+            #     df = readMatchData("match_data.csv")
+            #     counts = df['action'].value_counts().to_dict()
+            #     total = sum(counts.values())
+            #     try:
+            #         l_v = 1 - counts[variable_i]/total
+            #     except KeyError:
+            #         l_v = 0
+            # else:
+            #     raise Exception("Link weight type not supported!")
 
             if link_type == '-->':
                 adjacency_matrix[pos_i, pos_j] = 1
@@ -147,6 +153,27 @@ def read_pcmci_row(row):
 
     return variable_i, variable_j, time_lag, link_type, link_value
 
+def create_node_features_2(player_df, num_var, tau):
+    # player_df is a match_df subset with that player
+    node_features = []
+    # Each node feature has size tau and is a list of actions leading to current action
+    for t in range(tau-1):
+        for i in range(num_var):
+            past_actions = [-1 for _ in range(tau)]
+            time_cutoff = tau - t
+            for _, row in pcmci_links.iterrows():
+                variable_i, variable_j, time_lag, _, _ = read_pcmci_row(
+                    row)
+                if variable_j == i and time_lag <= time_cutoff and time_lag > 0:
+                    index = tau - time_lag
+                    if past_actions[index] == -1:
+                        # TODO: Need a better solution, for now just use the first one
+                        past_actions[index] = variable_i
+            node_features.append(past_actions)
+    for _ in range(num_var):
+        node_features.append([-1 for _ in range(tau)])
+    # print(node_features)
+    return np.array(node_features)
 
 def create_node_features(pcmci_links, num_var, tau):
     print("Creating node features...")
@@ -240,8 +267,10 @@ def evaluate_model(model, test_data):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    # parser.add_argument('--pcmci-path', type=str,
+    #                     default=get_last_subfolder("saves"))
     parser.add_argument('--pcmci-path', type=str,
-                        default=get_last_subfolder("saves"))
+                        default="saves/2025-02-19-14-54-36")
     parser.add_argument('--model-type', type=str,
                         default="gatv2", help=f"Possible model types: {[e.value for e in ModelTypes]}")
     parser.add_argument('--tau', type=int, default=TAU_MAX)

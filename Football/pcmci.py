@@ -15,7 +15,7 @@ import shutil
 
 
 def runPCMCI(save_graphs=False, save_time_series_graphs=False, save_result=False):
-    df = readMatchData("match_data_causal.csv")
+    df = readMatchData("match_data_causal_2.csv")
     print('Data loaded')
 
     # all_player_results = {}
@@ -75,6 +75,9 @@ def runPCMCI(save_graphs=False, save_time_series_graphs=False, save_result=False
     if save_result:
         with open(f'{save_path}/result.pkl', 'wb') as f:
             pickle.dump(result, f)
+
+    np.save(f'{save_path}/val_matrix.npy', result['val_matrix'])
+    np.save(f'{save_path}/graph.npy', result['graph'])
     print('PCMCI saved')
     return result
 
@@ -151,7 +154,7 @@ def copyFile(file_path, fname):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--action-path', type=str, default="fkeys/action.csv")
+    parser.add_argument('--action-path', type=str, default="fkeys/action_2.csv")
     parser.add_argument('--tau', type=int, default=TAU_MAX)
     args = parser.parse_args()
     tau_max = args.tau
@@ -161,4 +164,5 @@ if __name__ == '__main__':
     os.makedirs(save_path, exist_ok=True)
     runPCMCI(save_graphs=False,
              save_time_series_graphs=False, save_result=False)
-    copyFile(action_path, 'action.csv')
+    copyFile(action_path, 'action_2.csv')
+    # copyFile('fkeys/action_2.csv', 'action_2.csv')
