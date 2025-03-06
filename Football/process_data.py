@@ -161,46 +161,6 @@ def gatData(match_folder):
     new_df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
     return new_df
 
-    # if not os.path.exists(f'matches/{match_folder}/match_data_causal.csv'):
-    #     causalData(match_folder)
-    # df = pd.read_csv(f'matches/{match_folder}/match_data_causal.csv')
-    # columns = [f'action_(t-{TAU_MAX-i})' for i in range(TAU_MAX)]
-    # columns.extend(['result'])
-    # results = []
-    # # read TAU_MAX+1 rows at a time
-    # for index in range(TAU_MAX, len(df)):
-    #     temp_df = df.iloc[index-TAU_MAX:index+1]
-    #     actions = []
-    #     skip = False
-    #     for i in range(len(temp_df)):
-    #         action = list(np.where(temp_df.iloc[i, 2:] == 1)[0])
-    #         if len(action) == 0 and i == 0:
-    #             skip = True
-    #             break
-    #         # Interpolate missing actions
-    #         actions.append(action if len(action) > 0 else actions[i-1])
-    #     if not skip:
-    #         results = expand_2d_list(results, actions)
-    # gat_df = pd.DataFrame(results, columns=columns)
-    # gat_df.to_csv(f'matches/{match_folder}/match_data_gat.csv', index=False)
-
-
-# def expand_2d_list(results, lst):
-#     # Base case: if every element in lst is length 1, return lst as 1 list
-#     if all([len(elem) == 1 for elem in lst]):
-#         results.append([elem[0] for elem in lst])
-#     # Recursive case:
-#     else:
-#         # Find the first element in lst that is not length 1
-#         for i, elem in enumerate(lst):
-#             if len(elem) != 1:
-#                 # For each element in elem, create a new list with that element
-#                 for item in elem:
-#                     new_lst = lst.copy()
-#                     new_lst[i] = [item]
-#                     expand_2d_list(results, new_lst)
-#                 break
-#     return results
 
 def distance(row1, row2):
     return ((row1['x_begin']-row2['x_begin'])**2+(row1['y_begin']-row2['y_begin'])**2)**0.5
@@ -259,11 +219,7 @@ def causalData2(match_folder):
 
 if __name__ == '__main__':
     # matchData()
-    max_match_folder = 10
-    for m in range(max_match_folder):
-    #     print(f'Processing match_{m}')
+    for m in range(MAX_MATCH_FOLDER):
+        print(f'Processing match_{m}')
         match_folder = f'match_{m}'
         causalData2(match_folder)
-    #     causalData(match_folder)
-    #     gatData(match_folder)
-    # mlpData(match_folder)

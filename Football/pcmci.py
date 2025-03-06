@@ -159,10 +159,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     tau_max = args.tau
     action_path = args.action_path
+
     folder_name = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
     save_path = f'saves/{folder_name}'
-    os.makedirs(save_path, exist_ok=True)
-    runPCMCI(save_graphs=False,
-             save_time_series_graphs=False, save_result=False)
+    os.makedirs(save_path)
+    runPCMCI(save_graphs=False, save_time_series_graphs=False, save_result=False)
     copyFile(action_path, 'action_2.csv')
-    # copyFile('fkeys/action_2.csv', 'action_2.csv')

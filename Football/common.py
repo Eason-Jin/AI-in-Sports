@@ -4,8 +4,8 @@ import torch
 
 TAU_MAX = 5
 CLOSE_THRESHOLD = 45
-DEVICE = torch.device("cuda")
-# DEVICE = torch.device("cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+MAX_MATCH_FOLDER = 10
 
 
 def searchDF(df, conditions):
@@ -54,7 +54,7 @@ def searchDF(df, conditions):
     return df
 
 
-def readMatchData(file_name, max_match_folder=10):
+def readMatchData(file_name, max_match_folder=MAX_MATCH_FOLDER):
     """
     The equivalent of PandasFormatterEnsemble
     """
