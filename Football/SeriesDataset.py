@@ -1,7 +1,7 @@
 from typing import Callable
 import torch
 from torch.utils.data import Dataset
-from common import DEVICE
+# from common import DEVICE
 
 
 class SeriesDataset(Dataset):
@@ -25,7 +25,7 @@ class SeriesDataset(Dataset):
                 y.append(target)
                 individual.append(key)
 
-        return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32, device=DEVICE), individual
+        return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32), individual
 
     def __len__(self):
         return len(self.x)

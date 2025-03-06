@@ -16,7 +16,8 @@ class TSPredictor(pl.LightningModule):
             y_pred = y_pred.softmax(dim=-1)
             y = y[:,:,torch.where(~torch.tensor([i in self.masked_idxs_for_training for i in range(self.num_var)]))[0]]
 
-        loss = torch.nn.functional.binary_cross_entropy(y_pred, y)
+
+        loss = torch.nn.functional.cross_entropy(y_pred, y)
         self.log('train_loss', loss)
         return loss
     
@@ -69,15 +70,13 @@ class TSGNNPredictor(TSPredictor):
         batch_size = x.shape[0]
         features = torch.nn.functional.one_hot(torch.arange(self.num_var)).reshape((1,1,self.num_var,self.num_var)).repeat(batch_size,self.tau,1,1).to(DEVICE)
         
-        print(x.shape)
-        print(features.shape)
         features = x.unsqueeze(-1) * features
         features = self.input_layer(features)
 
         outputs = torch.zeros_like(features) # shape is (batch_size, tau, num_var, hidden_size)
         for i, layer in enumerate(self.graph_layers):
             features_i = features[:,:i+1,:,:].view((batch_size, (i+1)*self.num_var, self.hidden_size))
-            edges_i = torch.stack(torch.where(self.graph[:,:,:i+1].permute(2,0,1).reshape(((i+1)*self.num_var, self.num_var))), dim=0).to(DEVICE)
+            edges_i = torch.stack(torch.where(self.graph[:,:,:i+1].permute(2,0,1).reshape(((i+1)*self.num_var, self.num_var))), dim=0)
 
             if isinstance(layer, tg.nn.GATConv) or isinstance(layer, tg.nn.GATv2Conv): # GATConv and GATv2Conv do not support static graph (see https://github.com/pyg-team/pytorch_geometric/issues/2844 and https://pytorch-geometric.readthedocs.io/en/latest/notes/cheatsheet.html)
                 data_list = [tg.data.Data(features_i[j], edges_i) for j in range(len(features_i))]
