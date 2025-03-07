@@ -1,0 +1,5 @@
+Tau: 10
+PCMCI Path: saves\2025-03-07-18-30-50
+Direct Prediction Accuracy: 36.93000030517578
+Direct Prediction Accuracy (last layer only): 22.690000534057617
+Notes: close 20

@@ -2,8 +2,8 @@ import pandas as pd
 import os
 import torch
 
-TAU_MAX = 5
-CLOSE_THRESHOLD = 45
+TAU_MAX = 10
+CLOSE_THRESHOLD = 20
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MAX_MATCH_FOLDER = 10
 

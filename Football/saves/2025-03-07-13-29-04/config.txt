@@ -1,0 +1,5 @@
+Tau: 10
+PCMCI Path: saves\2025-03-07-13-29-04
+Direct Prediction Accuracy: 10.470000267028809
+Direct Prediction Accuracy (last layer only): 9.270000457763672
+Notes: closer close team/opponents (5 instead of 45)

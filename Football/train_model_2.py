@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from common import TAU_MAX, DEVICE, get_last_subfolder, readMatchData, searchDF
 from models.predictor import CausalGATv2Wrapper
 import argparse
@@ -23,8 +24,10 @@ def direct_prediction_accuracy(model, loader, num_var, masked_index):
         y_pred = model(x)
 
         # Remove masked variables
-        y_pred = y_pred[:,:,torch.where(~torch.tensor([i in masked_index for i in range(num_var)]))[0]]
-        y = y[:,:,torch.where(~torch.tensor([i in masked_index for i in range(num_var)]))[0]]
+        y_pred = y_pred[:, :, torch.where(~torch.tensor(
+            [i in masked_index for i in range(num_var)]))[0]]
+        y = y[:, :, torch.where(~torch.tensor(
+            [i in masked_index for i in range(num_var)]))[0]]
 
         y_pred = y_pred.softmax(dim=-1)
 
@@ -39,9 +42,22 @@ def direct_prediction_accuracy(model, loader, num_var, masked_index):
 def evaluate_model(save_path, loader, num_var, masked_index):
     with open(f"{save_path}/model.pkl", "rb") as f:
         model = pickle.load(f)
-    acc, acc_last = direct_prediction_accuracy(model, loader, num_var, masked_index)
+    acc, acc_last = direct_prediction_accuracy(
+        model, loader, num_var, masked_index)
     print(f"Direct Prediction Accuracy: {torch.round(acc*100, decimals=2)}")
-    print(f"Direct Prediction Accuracy (last layer only): {torch.round(acc_last*100, decimals=2)}")
+    print(
+        f"Direct Prediction Accuracy (last layer only): {torch.round(acc_last*100, decimals=2)}")
+
+    with open(f'{pcmci_path}/config.txt', 'w') as f:
+        f.write(f'Tau: {tau_max}\n')
+        f.write(f'PCMCI Path: {pcmci_path}\n')
+        f.write(
+            f"Direct Prediction Accuracy: {torch.round(acc*100, decimals=2)}\n")
+        f.write(
+            f"Direct Prediction Accuracy (last layer only): {torch.round(acc_last*100, decimals=2)}\n")
+        f.write('Notes: ')
+        if notes:
+            f.write(notes)
 
 
 def split_list(player_ids, split_ratio=0.8):
@@ -61,10 +77,16 @@ if __name__ == '__main__':
                         default=get_last_subfolder("saves"))
     parser.add_argument('--tau', type=int, default=TAU_MAX)
     parser.add_argument('--load', type=bool, default=False)
+    parser.add_argument('--notes', type=str)
     args = parser.parse_args()
-    pcmci_path = args.pcmci_path
+    if not args.pcmci_path.startswith("saves"):
+        pcmci_path = "saves/" + args.pcmci_path
+    else:
+        pcmci_path = args.pcmci_path
+    print(f"Saving to {pcmci_path}")
     tau_max = args.tau
     load = args.load
+    notes = args.notes
 
     # Only considering the first match right now
     match_df = readMatchData("match_data_causal_2.csv")
@@ -78,7 +100,7 @@ if __name__ == '__main__':
             masked_index.append(variables.index(v))
 
     train_sequences, test_sequences, val_sequences = {}, {}, {}
-    
+
     player_ids = match_df['player_id'].unique()
     train_players, test_players = split_list(player_ids, split_ratio=0.8)
     train_players, val_players = split_list(train_players, split_ratio=0.8)
@@ -99,9 +121,9 @@ if __name__ == '__main__':
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
-    if not load:
-        num_var = len(match_df.columns)-1   # Minus "player_id"
+    num_var = len(match_df.columns)-1   # Minus "player_id"
 
+    if not load:
         val_matrix = np.load(f'{pcmci_path}/val_matrix.npy')
         graph = np.load(f'{pcmci_path}/graph.npy')
         val_matrix = torch.nan_to_num(
@@ -113,6 +135,22 @@ if __name__ == '__main__':
         graph = torch.from_numpy(graph).float().to(DEVICE)
 
         weights = (graph*val_matrix).to(DEVICE)
+
+        # Normalised weights
+        # total_links = num_var**2
+        # pcmci_links = pd.read_csv(f"{pcmci_path}/links.csv")
+        # action_df = pd.read_csv(f"{pcmci_path}/action_2.csv")
+        # counts = np.zeros((num_var, num_var, tau_max+1))
+        # for index, row in pcmci_links.iterrows():
+        #     v_i = int(
+        #         action_df[action_df['action'] == row["Variable i"]]['id'].iloc[0])
+        #     v_j = int(
+        #         action_df[action_df['action'] == row["Variable j"]]['id'].iloc[0])
+        #     lag = int(row["Time lag of i"])
+        #     counts[v_i][v_j][lag] += 1
+        # weights = np.where(
+        #     counts != 0, 1 - (counts / total_links), 0)
+        # weights = torch.from_numpy(weights).float().to(DEVICE)
 
         model = CausalGATv2Wrapper(
             num_var=num_var, tau=tau_max+1, weights=weights, masked_idxs_for_training=masked_index)

@@ -43,7 +43,7 @@ def create_data(node_features, adjacency_matrix_sparse, weight_matrix_sparse, ta
 
 def create_model(node_features, out_channels, device, model_type):
     print(f"Creating model of type {model_type}...")
-    if model_type == ModelTypes.GATv2:
+    if model_type == "gatv2":
         model = GATv2(
             in_channels=node_features.shape[1],
             hidden_channels=128,
@@ -51,7 +51,7 @@ def create_model(node_features, out_channels, device, model_type):
             heads=tau_max,
             dropout=0.2
         ).to(device)
-    elif model_type == ModelTypes.GCN:
+    elif model_type == "gcn":
         model = GCN(
             in_channels=node_features.shape[1],
             hidden_channels=128,
@@ -105,23 +105,22 @@ def create_matrices(pcmci_links, num_var, tau, link_type):
             # Map variables to their respective nodes in the flattened graph
             pos_i = (time_lag-1) * num_var + variable_i
             pos_j = (time_lag-1) * num_var + variable_j
-            random_number = np.random.rand()/1000
-            l_v = random_number
-            # if link_type == LinkTypes.RANDOM:
-            #     random_number = np.random.rand()/1000
-            #     l_v = random_number
-            # elif link_type == LinkTypes.PCMCI:
-            #     l_v = link_value
-            # elif link_type == LinkTypes.INVERSE_COUNT:
-            #     df = readMatchData("match_data.csv")
-            #     counts = df['action'].value_counts().to_dict()
-            #     total = sum(counts.values())
-            #     try:
-            #         l_v = 1 - counts[variable_i]/total
-            #     except KeyError:
-            #         l_v = 0
-            # else:
-            #     raise Exception("Link weight type not supported!")
+
+            if link_type == "random":
+                random_number = np.random.rand()/1000
+                l_v = random_number
+            elif link_type == "pcmci":
+                l_v = link_value
+            elif link_type == "inv_count":
+                df = readMatchData("match_data.csv")
+                counts = df['action'].value_counts().to_dict()
+                total = sum(counts.values())
+                try:
+                    l_v = 1 - counts[variable_i]/total
+                except KeyError:
+                    l_v = 0
+            else:
+                raise Exception("Link weight type not supported!")
 
             if link_type == '-->':
                 adjacency_matrix[pos_i, pos_j] = 1
@@ -153,27 +152,6 @@ def read_pcmci_row(row):
 
     return variable_i, variable_j, time_lag, link_type, link_value
 
-def create_node_features_2(player_df, num_var, tau):
-    # player_df is a match_df subset with that player
-    node_features = []
-    # Each node feature has size tau and is a list of actions leading to current action
-    for t in range(tau-1):
-        for i in range(num_var):
-            past_actions = [-1 for _ in range(tau)]
-            time_cutoff = tau - t
-            for _, row in pcmci_links.iterrows():
-                variable_i, variable_j, time_lag, _, _ = read_pcmci_row(
-                    row)
-                if variable_j == i and time_lag <= time_cutoff and time_lag > 0:
-                    index = tau - time_lag
-                    if past_actions[index] == -1:
-                        # TODO: Need a better solution, for now just use the first one
-                        past_actions[index] = variable_i
-            node_features.append(past_actions)
-    for _ in range(num_var):
-        node_features.append([-1 for _ in range(tau)])
-    # print(node_features)
-    return np.array(node_features)
 
 def create_node_features(pcmci_links, num_var, tau):
     print("Creating node features...")
@@ -213,7 +191,6 @@ def create_node_features(pcmci_links, num_var, tau):
         for _ in range(num_var):
             node_features.append([-1 for _ in range(tau)])
             bar()
-    # print(node_features)
     return np.array(node_features)
 
 
@@ -272,20 +249,19 @@ if __name__ == '__main__':
     parser.add_argument('--pcmci-path', type=str,
                         default="saves/2025-02-19-14-54-36")
     parser.add_argument('--model-type', type=str,
-                        default="gatv2", help=f"Possible model types: {[e.value for e in ModelTypes]}")
+                        default="gatv2")
     parser.add_argument('--tau', type=int, default=TAU_MAX)
     parser.add_argument('--load-model', type=str,
                         help="Path to load existing model for evaluation")
     parser.add_argument(
         '--notes', type=str, help="Notes for the model (will be written to config.txt)")
-    parser.add_argument('--link-type', type=str, default='random',
-                        help=f'Possible link types: {[e.value for e in LinkTypes]}')
+    parser.add_argument('--link-type', type=str, default='random')
     args = parser.parse_args()
     pcmci_path = args.pcmci_path
     model_type = args.model_type
     tau_max = args.tau
-    load_path = get_enum_key(ModelTypes, args.load_model)
-    link_type = get_enum_key(LinkTypes, args.link_type)
+    load_path = args.load_model
+    link_type = args.link_type
 
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = torch.device('cpu')
